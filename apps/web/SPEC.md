@@ -4,7 +4,7 @@ type: module-design
 status: active
 title: Web UI client
 parent: architecture
-depends-on: [module-contracts, module-ui, module-extension-api, module-ext-visualize]
+depends-on: [module-contracts, module-locales, module-ui, module-extension-api, module-ext-visualize]
 tags: [ui]
 ---
 
@@ -18,8 +18,9 @@ event stream as a chat-centric, multi-session IDE shell.
 - **Owns:** the browser UI — client-local navigation and workbench state, transport client, store, panels, the responsive shell, branding tokens.
 - **Public surface:** the built static bundle (`dist/`) — a deployable artifact that dials a host.
 - **Allowed deps:** `@thinkrail/contracts` (types plus its small pure runtime: WS constants, versions,
-  guards, `createQuitConfirmation`; see [[module-contracts]]), `@thinkrail/ui/*`,
-  `@thinkrail/extension-api/web`, and `@thinkrail/ext-*/web`; React / Zustand / Vite / etc.
+  guards, `createQuitConfirmation`; see [[module-contracts]]), `@thinkrail/locales` (UI strings + the
+  shared i18next instance; see [[module-locales]]), `@thinkrail/ui/*`, `@thinkrail/extension-api/web`,
+  and `@thinkrail/ext-*/web`; React / Zustand / Vite / etc.
 - **Deployment obligation:** one built client serves every launcher and future deployment. Endpoint selection
   belongs to the transport bootstrap; panels, stores, and feature flows never branch on `cli`, `desktop`, or
   a deployment name.
@@ -49,6 +50,7 @@ convention; their boundary is held by convention + spec. Sibling edges live here
 | `components` | dependency-light app primitives: error isolation, status icons, custom icons, quiet scroll frames | no | [components/SPEC.md](src/components/SPEC.md) |
 | `extensions` | ordered composition of web extension descriptors into the chat registry | yes | [extensions/SPEC.md](src/extensions/SPEC.md) |
 | `themes` | validated single-file manifests, bundled catalog + atomic token application | yes | [themes/SPEC.md](src/themes/SPEC.md) |
+| `i18n` | active language: synced preference + browser languages + bundled/local catalogs → the shared i18next instance, `<html lang>`, desktop menu labels | yes | [i18n/SPEC.md](src/i18n/SPEC.md) |
 | `lib` | shared path/array primitives + highlighting | yes | [lib/SPEC.md](src/lib/SPEC.md) |
 
 Leaf utilities without their own spec: `constants/` (branding — the product name, storage/event prefixes, and the one
@@ -161,6 +163,8 @@ change. `dist/` therefore has no profiler timers (`actualStartTime` is absent fr
 - `resources` → `contracts` (types only), `lib`; it owns no store, transport, shell, or renderer implementation
 - `lib` → `themes` (the lazy highlighter uses the one generic CSS-variable Shiki registration), React (the phone-viewport hook only), and `contracts` (types only, e.g. the MCP state vocabulary's `McpServerState`)
 - `themes` → `constants` (the branding storage prefix scopes the first-paint hint), `clientPreferences` (native-stable hint storage)
+- `i18n` → `store`, `transport`, `contracts`, `@thinkrail/locales`; `shell` mounts `useLocaleSync` once and `panels` renders the Language page from its selectors
+- **Any module may → `@thinkrail/locales/react`** (`useT`, `<T>`, `currentLocale`) for its UI text — the one cross-cutting edge besides `lib`; user-facing text is never a literal ([[architecture]] Decision 22)
 - leaves (`clientPreferences`, `constants`, `utils`, `styles`) → none internal
 
 Rules: a panel never imports another panel sideways; nothing imports `shell` (it's the composition root).
