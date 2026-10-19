@@ -32,6 +32,7 @@ const MODULE_RULES: readonly ModuleRule[] = [
 		root: "packages/server",
 		allowed: [
 			"packages/contracts",
+			"packages/locales",
 			"packages/shared",
 			"packages/spec-graph",
 			"packages/pi-delegation",
@@ -44,12 +45,12 @@ const MODULE_RULES: readonly ModuleRule[] = [
 	},
 	{
 		root: "apps/web",
-		allowed: ["packages/contracts", "packages/ui", "packages/extension-api"],
+		allowed: ["packages/contracts", "packages/locales", "packages/ui", "packages/extension-api"],
 	},
 	{ root: "apps/cli", allowed: ["packages/server", "packages/shared"] },
 	{
 		root: "apps/desktop",
-		allowed: ["packages/server", "packages/shared", "packages/contracts"],
+		allowed: ["packages/server", "packages/shared", "packages/contracts", "packages/locales"],
 	},
 ];
 
@@ -103,7 +104,14 @@ function moduleRules(packages: ReadonlyMap<string, string>): ModuleRule[] {
 		),
 		...roots
 			.filter((root) => root === "packages/ui" || root === "packages/extension-api")
-			.map((root) => ({ root, allowed: ["packages/contracts"] })),
+			.map((root) => ({
+				root,
+				allowed:
+					root === "packages/ui"
+						? ["packages/contracts", "packages/locales"]
+						: ["packages/contracts"],
+			})),
+		...roots.filter((root) => root === "packages/locales").map((root) => ({ root, allowed: [] })),
 		...roots
 			.filter((root) => root.startsWith("pi-extensions/"))
 			.map((root) => ({ root, allowed: [] })),
@@ -111,6 +119,7 @@ function moduleRules(packages: ReadonlyMap<string, string>): ModuleRule[] {
 			root,
 			allowed: [
 				"packages/contracts",
+				"packages/locales",
 				"packages/ui",
 				"packages/extension-api",
 				piExtensionRoot(root),
@@ -242,7 +251,15 @@ function sourceRule(rule: ModuleRule, subpath: string): ModuleRule {
 	if (!rule.root.startsWith("thinkrail-extensions/")) return rule;
 	switch (sourceHalf(subpath)) {
 		case "web":
-			return { ...rule, allowed: ["packages/contracts", "packages/ui", "packages/extension-api"] };
+			return {
+				...rule,
+				allowed: [
+					"packages/contracts",
+					"packages/locales",
+					"packages/ui",
+					"packages/extension-api",
+				],
+			};
 		case "server":
 			return { ...rule, allowed: ["packages/extension-api", piExtensionRoot(rule.root)] };
 		default:
@@ -293,6 +310,7 @@ function sourceViolation(
 		rule.root === "apps/web" ||
 		rule.root === "packages/ui" ||
 		rule.root === "packages/contracts" ||
+		rule.root === "packages/locales" ||
 		sdk ||
 		(extension && half === "web");
 	const piPackage =

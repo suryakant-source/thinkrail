@@ -496,3 +496,31 @@ test("accepts SDK edges, extension manifest unions, same-half sources, and publi
 	);
 	expect(moduleBoundaryViolations(root)).toEqual([]);
 });
+
+test("locales is a leaf every UI surface and the host may import", () => {
+	const root = fixture();
+	for (const [moduleRoot, name, dependencies] of [
+		["packages/locales", "@thinkrail/locales", []],
+		["packages/ui", "@thinkrail/ui", ["@thinkrail/locales"]],
+		["apps/web", "@thinkrail/web", ["@thinkrail/contracts", "@thinkrail/locales"]],
+	] as const) {
+		write(
+			root,
+			`${moduleRoot}/package.json`,
+			JSON.stringify({
+				name,
+				dependencies: Object.fromEntries(dependencies.map((dep) => [dep, "workspace:*"])),
+			}),
+		);
+	}
+	write(root, "apps/web/src/a.ts", 'import "@thinkrail/locales/react";');
+	write(root, "packages/ui/a.ts", 'import "@thinkrail/locales/react";');
+	write(root, "packages/server/src/a.ts", 'import "@thinkrail/locales";');
+	write(root, "apps/desktop/src/a.ts", 'import "@thinkrail/locales";');
+	expect(moduleBoundaryViolations(root)).toEqual([]);
+
+	write(root, "packages/locales/src/b.ts", 'import "@thinkrail/contracts";');
+	expect(moduleBoundaryViolations(root)).toEqual([
+		'packages/locales/src/b.ts: import "@thinkrail/contracts" creates forbidden packages/locales -> packages/contracts edge',
+	]);
+});
