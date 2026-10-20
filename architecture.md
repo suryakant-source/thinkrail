@@ -55,7 +55,7 @@ pi-extensions/*     portable pi packages published to npm as @thinkrail/pi-<name
 thinkrail-extensions/*  ThinkRail extensions: a pi capability + ./server and ./web halves, composed by one
                     registry file per side (Decision 21; visualize shipped) ── depends on ─▶ pi-extensions/*,
                     packages/extension-api, packages/ui, packages/locales (web half)
-packages/extension-api  types + define* helpers for extension halves ── depends on ─▶ packages/contracts
+packages/extension-api  types + define* helpers for extension halves ── depends on ─▶ packages/contracts, packages/locales (types)
 packages/ui         owned shadcn/Radix primitives + cn + onThemeSwap ── may depend on ─▶ packages/contracts, packages/locales
 ```
 

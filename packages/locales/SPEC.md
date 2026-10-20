@@ -32,7 +32,9 @@ onto separate instances.
     must be a JSON object. Dropped, silently: non-string and empty values (English shows instead); a string
     for a known key whose `{{placeholder}}` set or indexed-markup set (`<0>`, `</0>`, `<1/>`) differs from
     English's; any tag that is not a bare indexed marker (no attributes, no named tags — a catalog must not
-    override a code-owned component's props such as a link's `href`). Unknown keys are kept as data (a file
+    override a code-owned component's props such as a link's `href`; tags are found with react-i18next's own
+    quote-aware parser pattern, and a `<` followed by `{{` is rejected so interpolation can never complete a
+    tag). Values containing `$t(` nesting are dropped. Unknown keys are kept as data (a file
     may be older or newer than the app); key lookups use own properties only, so `constructor` or
     `__proto__` are ordinary keys. The bundled English catalog passes this same validation.
   - `resolveLocale(preference, available, systemLanguages)` — `"system"` walks `systemLanguages` and

@@ -106,10 +106,7 @@ function moduleRules(packages: ReadonlyMap<string, string>): ModuleRule[] {
 			.filter((root) => root === "packages/ui" || root === "packages/extension-api")
 			.map((root) => ({
 				root,
-				allowed:
-					root === "packages/ui"
-						? ["packages/contracts", "packages/locales"]
-						: ["packages/contracts"],
+				allowed: ["packages/contracts", "packages/locales"],
 			})),
 		...roots.filter((root) => root === "packages/locales").map((root) => ({ root, allowed: [] })),
 		...roots

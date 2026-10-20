@@ -1,7 +1,7 @@
 import { RiFileTextLine, RiStackLine } from "@remixicon/react";
 import { strArg, type ToolRenderProps } from "@thinkrail/extension-api/web";
 import type { MessageKey } from "@thinkrail/locales";
-import { t as translate, useT } from "@thinkrail/locales/react";
+import { type Translator, useT } from "@thinkrail/locales/react";
 import { cn } from "@thinkrail/ui/utils";
 import { useFold } from "../../foldState";
 import { McpActions, McpCliActionButton, useMcpFailureText } from "./McpActions";
@@ -38,8 +38,8 @@ function listingServer(args: Record<string, unknown>, result: unknown): string {
 	return strArg(args, "server") || readMcpToolDetails(result)?.server || "";
 }
 
-export function mcpListingSummary({ args, result }: ToolRenderProps): string {
-	return listingServer(args, result) || translate("mcp.listing.allServersSummary");
+export function mcpListingSummary({ args, result }: ToolRenderProps, t: Translator): string {
+	return listingServer(args, result) || t("mcp.listing.allServersSummary");
 }
 
 export function mcpReadSummary({ args }: ToolRenderProps): string {

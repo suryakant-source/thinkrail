@@ -100,7 +100,7 @@ function englishReference(key: string): string | undefined {
 }
 
 function acceptable(key: string, value: string): boolean {
-	if (value === "" || value.includes("$t(")) return false;
+	if (value === "" || value.includes("$t(") || /<\s*\/?\s*\{\{/.test(value)) return false;
 	const shape = markup(value);
 	if (shape === null) return false;
 	const reference = englishReference(key);

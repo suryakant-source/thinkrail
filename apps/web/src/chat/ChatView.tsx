@@ -359,12 +359,12 @@ export default function ChatView({
 	const mergedCommands = useMemo(
 		() =>
 			mergeNativeChatCommands(
+				t,
 				[
 					...commands.filter((command) => command.source !== "prompt"),
 					...templates.map(templateToSlashCommand),
 				],
 				canRenameChat,
-				t,
 			),
 		[canRenameChat, commands, t, templates],
 	);

@@ -492,6 +492,7 @@ function ToolRow({
 	workspaceRoot?: string | undefined;
 	onOpenFile?: ((path: string) => void) | undefined;
 }) {
+	const t = useT();
 	if (getToolChrome(row.toolName) === "bare") {
 		const renderProps: ToolRenderProps = {
 			toolCallId: row.toolCallId,
@@ -505,7 +506,10 @@ function ToolRow({
 		};
 		return (
 			<div className="tr-text-ui text-text-default">
-				<ToolRendererBody {...renderProps} imageLabel={getToolSummary(row.toolName, renderProps)} />
+				<ToolRendererBody
+					{...renderProps}
+					imageLabel={getToolSummary(t, row.toolName, renderProps)}
+				/>
 				<ToolPromptSlot toolCallId={row.toolCallId} className="mt-8" />
 			</div>
 		);

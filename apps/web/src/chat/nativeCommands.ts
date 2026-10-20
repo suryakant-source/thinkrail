@@ -1,13 +1,11 @@
 import type { SlashCommandInfo } from "@thinkrail/contracts";
-import { t as translate, type useT } from "@thinkrail/locales/react";
+import { type Translator, t as translate } from "@thinkrail/locales/react";
 import type { SlashCommandItem } from "@/prompt";
 import { type PreparedChatTitle, prepareChatTitle } from "./chatTitle";
 
 const COMPACT_NAME = "compact";
 const NAME_NAME = "name";
 const MODEL_NAME = "model";
-
-type Translate = ReturnType<typeof useT>;
 
 export function compactSubmissionError(
 	hasDraftImages: boolean,
@@ -17,7 +15,7 @@ export function compactSubmissionError(
 	return hasQueuedImages ? translate("chat.commands.compactQueuedImageError") : null;
 }
 
-export const nativeChatCommands = (t: Translate = translate): readonly SlashCommandItem[] => [
+export const nativeChatCommands = (t: Translator): readonly SlashCommandItem[] => [
 	{
 		name: COMPACT_NAME,
 		description: t("chat.commands.compactDescription"),
@@ -96,9 +94,9 @@ export function prepareNameChatCommand(titleInput: string, hasImages: boolean): 
 }
 
 export function mergeNativeChatCommands(
+	t: Translator,
 	commands: readonly SlashCommandInfo[],
 	supportsSessionRename = false,
-	t: Translate = translate,
 ): SlashCommandItem[] {
 	const all = nativeChatCommands(t);
 	const native = supportsSessionRename ? all : all.filter((command) => command.name !== NAME_NAME);

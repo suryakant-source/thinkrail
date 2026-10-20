@@ -95,20 +95,29 @@ test("runCounters formats turns/tokens/cost/duration, skipping zeros", () => {
 });
 
 test("agentSummary is the live collapsed-header line, per status", () => {
-	expect(agentSummary(props({ result: undefined }))).toBe("scout: map the repo");
-	expect(agentSummary(props())).toBe(
+	expect(agentSummary(props({ result: undefined }), currentTranslator())).toBe(
+		"scout: map the repo",
+	);
+	expect(agentSummary(props(), currentTranslator())).toBe(
 		'scout · 12 turns · 30k tok · $0.040 · 45s · bash: rg -n "createServer"',
 	);
 	expect(
 		agentSummary(
 			props({ result: { details: details({ status: "queued", usage: details().usage }) } }),
+			currentTranslator(),
 		),
 	).toContain("scout · queued");
-	expect(agentSummary(props({ result: { details: details({ status: "completed" }) } }))).toBe(
-		"scout · 12 turns · 30k tok · $0.040 · 45s",
-	);
 	expect(
-		agentSummary(props({ args: { subagent_type: "scout", task: "t", run_in_background: true } })),
+		agentSummary(
+			props({ result: { details: details({ status: "completed" }) } }),
+			currentTranslator(),
+		),
+	).toBe("scout · 12 turns · 30k tok · $0.040 · 45s");
+	expect(
+		agentSummary(
+			props({ args: { subagent_type: "scout", task: "t", run_in_background: true } }),
+			currentTranslator(),
+		),
 	).toContain("background");
 	expect(
 		agentSummary(
@@ -117,6 +126,7 @@ test("agentSummary is the live collapsed-header line, per status", () => {
 				args: { session_id: "child-1" },
 				result: undefined,
 			}),
+			currentTranslator(),
 		),
 	).toBe("child-1");
 });

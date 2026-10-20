@@ -55,7 +55,7 @@ export function JbcentralQuotaIndicator({
 		);
 	}
 
-	const value = formatJbcentralQuota(snapshot.remaining, snapshot.total);
+	const value = formatJbcentralQuota(snapshot.remaining, snapshot.total, localeOf(t));
 	const stale = snapshot.state === "stale";
 	const content = (
 		<>

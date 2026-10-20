@@ -1,7 +1,7 @@
 import type { DelegationRunDetails, DelegationRunStatus } from "@thinkrail/contracts";
 import { isDelegationRunDetails } from "@thinkrail/contracts";
 import { strArg, type ToolRenderProps } from "@thinkrail/extension-api/web";
-import { currentTranslator, type Translator } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 import { formatCost, formatElapsed, formatTokens } from "../../SessionStatsBar";
 
 export function readRunDetails(value: unknown): DelegationRunDetails | undefined {
@@ -64,8 +64,7 @@ export function reportTeaser(report: string): string {
 	return "";
 }
 
-export function agentSummary({ args, result }: ToolRenderProps): string {
-	const t = currentTranslator();
+export function agentSummary({ args, result }: ToolRenderProps, t: Translator): string {
 	const details = readRunDetails(result);
 	if (!details) {
 		const role = strArg(args, "subagent_type") || strArg(args, "session_id");

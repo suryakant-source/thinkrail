@@ -4,7 +4,7 @@ import {
 } from "@remixicon/react";
 import { isPlanReviewResult, type PlanReviewResult } from "@thinkrail/contracts";
 import type { ToolRenderProps } from "@thinkrail/extension-api/web";
-import { t as translate, useT } from "@thinkrail/locales/react";
+import { type Translator, useT } from "@thinkrail/locales/react";
 import type { ReactNode } from "react";
 import { ReviewPackageComments } from "../ReviewPackageComments";
 import { reviewFixCommentsToItems } from "../reviewPackage";
@@ -20,16 +20,16 @@ export function readPlanReview(raw: unknown): PlanReviewResult | null {
 	return isPlanReviewResult(raw) ? raw : null;
 }
 
-export function requestReviewSummary({ result }: ToolRenderProps): string {
+export function requestReviewSummary({ result }: ToolRenderProps, t: Translator): string {
 	const review = readPlanReview(result);
 	if (!review) return "";
 	if (review.verdict === "approve") {
 		const open = review.blockedByOpenFindings ?? 0;
 		return open > 0
-			? translate("tools.requestReview.summaryApprovedOpen", { title: review.itemTitle, open })
-			: translate("tools.requestReview.summaryApproved", { title: review.itemTitle });
+			? t("tools.requestReview.summaryApprovedOpen", { title: review.itemTitle, open })
+			: t("tools.requestReview.summaryApproved", { title: review.itemTitle });
 	}
-	return translate("tools.requestReview.summaryChanges", {
+	return t("tools.requestReview.summaryChanges", {
 		title: review.itemTitle,
 		count: review.findings.length,
 	});

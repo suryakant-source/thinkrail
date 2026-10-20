@@ -7,7 +7,7 @@ export interface RenderReachViolation {
 	text: string;
 }
 
-const LOCALE_READERS = new Set(["t", "i18n", "currentLocale"]);
+const LOCALE_READERS = new Set(["t", "i18n", "currentLocale", "currentTranslator"]);
 
 const SYNCHRONOUS_CALLBACKS = new Set([
 	"useAppStore",
@@ -59,6 +59,9 @@ function functionName(node: FunctionNode): string | undefined {
 }
 
 function isComponentOrHook(node: FunctionNode): boolean {
+	if (ts.isMethodDeclaration(node) && ts.isClassLike(node.parent)) {
+		return ts.isIdentifier(node.name) && node.name.text === "render";
+	}
 	const name = functionName(node);
 	return !!name && (/^[A-Z]/.test(name) || /^use[A-Z]/.test(name));
 }
@@ -77,7 +80,16 @@ function calleeName(call: ts.CallExpression): string | undefined {
 	return undefined;
 }
 
+function isRenderProp(fn: FunctionNode): boolean {
+	const container = fn.parent;
+	if (!ts.isJsxExpression(container)) return false;
+	const owner = container.parent;
+	if (ts.isJsxElement(owner) || ts.isJsxFragment(owner)) return true;
+	return ts.isJsxAttribute(owner) && /^(?:render[A-Z]?|children$)/.test(owner.name.getText());
+}
+
 function runsSynchronouslyIn(fn: FunctionNode): boolean {
+	if (isRenderProp(fn)) return true;
 	const parent = fn.parent;
 	if (ts.isCallExpression(parent) && parent.arguments.includes(fn as ts.Expression)) {
 		const name = calleeName(parent);
@@ -99,6 +111,15 @@ function isGetterLike(node: ts.Node): node is FunctionNode {
 			ts.isPropertyAssignment(node.parent) &&
 			ts.isIdentifier(node.parent.name) &&
 			node.parent.name.text === "get")
+	);
+}
+
+function isRenderSeam(node: ts.Node): node is FunctionNode {
+	return (
+		(ts.isArrowFunction(node) || ts.isFunctionExpression(node)) &&
+		ts.isPropertyAssignment(node.parent) &&
+		ts.isIdentifier(node.parent.name) &&
+		node.parent.name.text === "summary"
 	);
 }
 
@@ -147,9 +168,14 @@ export function renderReachViolations(
 			const symbol = symbolOf(node);
 			if (!symbol) return false;
 			if (readers.has(symbol) || translatingValues.has(symbol)) return true;
-			if (!translatingFunctions.has(symbol) || !ts.isCallExpression(node.parent)) return false;
-			const call = node.parent;
-			if (call.expression === node) return true;
+			if (!translatingFunctions.has(symbol)) return false;
+			const callee =
+				ts.isPropertyAccessExpression(node.parent) && node.parent.name === node
+					? node.parent
+					: node;
+			if (!ts.isCallExpression(callee.parent)) return false;
+			const call = callee.parent;
+			if (call.expression === callee) return true;
 			const name = calleeName(call);
 			return !!name && SYNCHRONOUS_CALLBACKS.has(name) && call.arguments.includes(node);
 		};
@@ -163,6 +189,8 @@ export function renderReachViolations(
 				}
 				ts.forEachChild(node, visit);
 			};
+			for (const parameter of fn.parameters)
+				if (parameter.initializer) visit(parameter.initializer);
 			if (fn.body) visit(fn.body);
 			return found;
 		};
@@ -179,7 +207,12 @@ export function renderReachViolations(
 			grew = false;
 			for (const file of sources) {
 				const visit = (node: ts.Node): void => {
-					if (isFunctionNode(node) && !isComponentOrHook(node) && !isGetterLike(node)) {
+					if (
+						isFunctionNode(node) &&
+						!isComponentOrHook(node) &&
+						!isGetterLike(node) &&
+						!isRenderSeam(node)
+					) {
 						const symbol = functionSymbol(node);
 						if (symbol && !translatingFunctions.has(symbol) && readsLocaleWhenCalled(node)) {
 							translatingFunctions.add(symbol);
@@ -205,17 +238,22 @@ export function renderReachViolations(
 
 		for (const file of sources) {
 			const visit = (node: ts.Node): void => {
-				if (isGetterLike(node) && readsLocaleWhenCalled(node)) {
+				if ((isGetterLike(node) || isRenderSeam(node)) && readsLocaleWhenCalled(node)) {
 					const { line } = file.getLineAndCharacterOfPosition(node.getStart(file));
 					violations.push({
 						file: relative(repoRoot, file.fileName).split(sep).join("/"),
 						line: line + 1,
-						text: "translating getter",
+						text: isGetterLike(node) ? "translating getter" : "summary reads the global translator",
 					});
 				}
 				if (ts.isIdentifier(node) && !ts.isImportSpecifier(node.parent)) {
 					const owner = ownerWhenEvaluated(node);
-					if (owner && isComponentOrHook(owner) && isLocaleRead(node)) {
+					const atModuleLoad =
+						!owner &&
+						!ts.isExportSpecifier(node.parent) &&
+						ts.isCallExpression(node.parent) &&
+						node.parent.expression === node;
+					if (((owner && isComponentOrHook(owner)) || atModuleLoad) && isLocaleRead(node)) {
 						const { line } = file.getLineAndCharacterOfPosition(node.getStart(file));
 						const key = `${file.fileName}:${line}:${node.text}`;
 						if (!seen.has(key)) {

@@ -333,7 +333,7 @@ function liveActivityTicker(
 	const current = flatSteps[flatSteps.length - 1];
 	if (!current) return t("chat.activity.working");
 	if (current.kind === "thinking") return t("chat.activity.thinkingLive");
-	const summary = getToolSummary(current.toolName, toolRenderProps(current, workspaceRoot));
+	const summary = getToolSummary(t, current.toolName, toolRenderProps(current, workspaceRoot));
 	return summary ? `${current.toolName} · ${summary}` : `${current.toolName}…`;
 }
 
@@ -365,10 +365,11 @@ function RoutineToolRow({
 	workspaceRoot?: string | undefined;
 	onOpenFile?: ((path: string) => void) | undefined;
 }) {
+	const t = useT();
 	const [expanded, toggle, toggleRef] = useFold(step.id);
 	const status: ToolStatus = step.tool?.status ?? (step.dead ? "error" : "running");
 	const renderProps = toolRenderProps(step, workspaceRoot, onOpenFile);
-	const summary = getToolSummary(step.toolName, renderProps);
+	const summary = getToolSummary(t, step.toolName, renderProps);
 	return (
 		<div
 			data-testid="activity-step"

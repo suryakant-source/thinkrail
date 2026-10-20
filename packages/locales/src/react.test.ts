@@ -113,3 +113,24 @@ test("localeOf names the language a translator was issued for", async () => {
 	applyLocale("en", {});
 	expect(renderToStaticMarkup(createElement(Probe))).toBe("en");
 });
+
+test("interpolation can never complete a tag: a value-built attributed tag is rejected before <T>", async () => {
+	const { createElement } = await import("react");
+	const { renderToStaticMarkup } = await import("react-dom/server");
+	const { T } = await import("./react");
+	const { validateCatalog } = await import("./index");
+	const local = validateCatalog({
+		"settings.language.add.steps": '<0>en.json</0><{{base}} title="injected"/>',
+		"lib.compactAge.underHour": "<1 год",
+	});
+	expect(local.ok && Object.keys(local.strings)).toEqual(["lib.compactAge.underHour"]);
+	applyLocale("de", { de: local.ok ? local.strings : {} });
+	const markup = renderToStaticMarkup(
+		createElement(T, {
+			i18nKey: "settings.language.add.steps",
+			values: { base: "0" },
+			components: [createElement("a", { key: "a", href: "https://github.com/" })],
+		}),
+	);
+	expect(markup).not.toContain("injected");
+});

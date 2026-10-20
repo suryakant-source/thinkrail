@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import type { SlashCommandInfo } from "@thinkrail/contracts";
+import { currentTranslator } from "@thinkrail/locales/react";
 import {
 	compactSubmissionError,
 	isModelCommand,
@@ -85,6 +86,7 @@ describe("native chat command parsing", () => {
 describe("native chat command catalog", () => {
 	it("orders supported built-ins first and reserves only their exact names", () => {
 		const merged = mergeNativeChatCommands(
+			currentTranslator(),
 			[
 				command("review"),
 				command("compact"),
@@ -106,14 +108,14 @@ describe("native chat command catalog", () => {
 			"skill:name",
 			"Compact",
 		]);
-		expect(merged[0]).toEqual(nativeChatCommands()[0]);
+		expect(merged[0]).toEqual(nativeChatCommands(currentTranslator())[0]);
 		expect(merged[0]?.source).toBe("builtin");
 		expect(merged[1]?.source).toBe("builtin");
-		expect(mergeNativeChatCommands([command("name")], false).map(({ name }) => name)).toEqual([
-			"compact",
-			"model",
-			"name",
-		]);
+		expect(
+			mergeNativeChatCommands(currentTranslator(), [command("name")], false).map(
+				({ name }) => name,
+			),
+		).toEqual(["compact", "model", "name"]);
 	});
 
 	it("recognizes only the built-in /model and hands its search text to the picker", () => {

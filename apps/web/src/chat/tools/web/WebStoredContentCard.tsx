@@ -1,6 +1,6 @@
 import { RiLinksLine as LinkIcon } from "@remixicon/react";
 import { numArg, resultText, strArg, type ToolRenderProps } from "@thinkrail/extension-api/web";
-import { currentTranslator, type Translator, useT } from "@thinkrail/locales/react";
+import { type Translator, useT } from "@thinkrail/locales/react";
 import { WebResultBody } from "./WebResultBody";
 
 function detailString(result: unknown, key: string): string {
@@ -27,8 +27,8 @@ export function storedContentTarget(
 	return "";
 }
 
-export function storedContentSummary({ args, result }: ToolRenderProps): string {
-	return storedContentTarget(currentTranslator(), args, result) || strArg(args, "responseId");
+export function storedContentSummary({ args, result }: ToolRenderProps, t: Translator): string {
+	return storedContentTarget(t, args, result) || strArg(args, "responseId");
 }
 
 export function WebStoredContentCard({ toolCallId, args, result, status }: ToolRenderProps) {

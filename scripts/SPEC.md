@@ -48,8 +48,11 @@ heuristic floor, not a proof: review still owns strings returned from plain func
 `packages/locales/en.json`: keys sorted, values non-empty, and every key (plural base for `_one`/`_other`)
 referenced as a string literal by some UI, desktop, or locales source, so removed UI leaves no orphaned
 translations. Finally it builds the web TypeScript program and fails on any **render-time read of the global
-translator** ([[module-locales]] § Render reads the translator as a value): a reference to `t`, `i18n` or
-`currentLocale` from `@thinkrail/locales/react` evaluated in a component or hook body (including
-`useMemo`/`useState` initializers, `useAppStore` selectors and `.map`-style callbacks), a call — or a
-by-reference pass to such a callback — of any function that reaches them synchronously (transitively), and
-any getter that reads them. Event handlers, effects and other deferred callbacks are event-time and pass. There is no suppression mechanism; a false positive is fixed in the checker with a test.
+translator** ([[module-locales]] § Render reads the translator as a value): a reference to `t`, `i18n`,
+`currentLocale` or `currentTranslator` from `@thinkrail/locales/react` evaluated in a render root — a
+component or hook body, a class `render()`, and what they run synchronously: `useMemo`/`useState`
+initializers, `useAppStore` selectors, `.map`-style callbacks, JSX function children and `render*` props;
+a call (direct, through a namespace import, or passed by reference to such a callback) of any function that
+reaches them synchronously, default parameters included, transitively; a module-load call; and any getter
+or registered tool `summary` that reads them. Event handlers (`on*` and other non-render props), effects and
+deferred callbacks are event-time and pass. Fixture tests pin each shape, both flagged and allowed. There is no suppression mechanism; a false positive is fixed in the checker with a test.
