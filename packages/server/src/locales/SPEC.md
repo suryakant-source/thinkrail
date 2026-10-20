@@ -19,10 +19,13 @@ translation logic: validation and file naming come from [[module-locales]].
 - **Owns:** creating the folder on start; scanning `*.json` (non-JSON and dot-prefixed names ignored);
   per-file status; the debounced folder watcher; the size caps (2 MB per file, 64 files — the rest are
   reported as errors).
-- **Public surface (barrel):** `startLocales({ dataDir, onChange })`, `listLocales()`, `localesDir()`,
-  `stopLocales()`.
+- **Public surface (barrel):** `localesDir()`, `readLocalLocales(dir?)` (read on every request — a
+  handful of small files, so no cache to invalidate), `watchLocalLocales({ dir?, onChange })` → stop
+  function, and the caps `MAX_LOCALE_FILE_BYTES` / `MAX_LOCALE_FILES`.
 - **Wire** (gated by `LOCALES_PROTOCOL_VERSION`): `locales.list` → `{ dir, files }`, each file
-  `{ tag, fileName, ok: true, strings } | { tag: string | null, fileName, ok: false, error }`;
+  `{ tag, fileName, ok: true, strings } | { tag: string | null, fileName, ok: false, error, detail? }`
+  where `error` is a code (`invalid-name`, `duplicate`, `too-large`, `too-many`, `unreadable`,
+  `invalid-json`, `not-object`) the client translates and `detail` is the untranslated parser/OS text;
   `locales.changed` is an **invalidation nudge, not data** — clients re-read `locales.list`, the same
   pattern as `workspace.fsChanged`; `locales.reveal` → `Ack` (`host` composes `localesDir()` with `editors`' file-manager reveal).
 - **Allowed deps:** `persistence` (`dataDir`), `log`; external

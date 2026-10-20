@@ -21,6 +21,7 @@ import {
 	isBackgroundCommandCompletionMessage,
 	isTodoReviewFixMessage,
 	JBCENTRAL_QUOTA_PROTOCOL_VERSION,
+	LOCALES_PROTOCOL_VERSION,
 	MCP_PROTOCOL_VERSION,
 	MCP_TOOL_GRANTS_PROTOCOL_VERSION,
 	MODEL_PICKER_PROTOCOL_VERSION,
@@ -198,10 +199,18 @@ test("the project trust summary and pi-level resource consent are pinned to v81"
 });
 
 test("workspace read state is pinned to v86", () => {
-	expect(PROTOCOL_VERSION).toBe(86);
+	expect(PROTOCOL_VERSION).toBeGreaterThanOrEqual(WORKSPACE_READ_STATE_PROTOCOL_VERSION);
 	expect(WORKSPACE_READ_STATE_PROTOCOL_VERSION).toBe(86);
 	expect(WS_METHODS.workspaceMarkUnread).toBe("workspace.markUnread");
 	expect(WS_METHODS.workspaceMarkRead).toBe("workspace.markRead");
+});
+
+test("local language files and the locale setting are pinned to v87", () => {
+	expect(PROTOCOL_VERSION).toBe(87);
+	expect(LOCALES_PROTOCOL_VERSION).toBe(87);
+	expect(WS_METHODS.localesList).toBe("locales.list");
+	expect(WS_METHODS.localesReveal).toBe("locales.reveal");
+	expect(WS_CHANNELS.localesChanged).toBe("locales.changed");
 });
 
 test("project rename is pinned to v85", () => {

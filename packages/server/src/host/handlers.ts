@@ -1,3 +1,4 @@
+import { mkdirSync } from "node:fs";
 import type {
 	OpenBranchReview,
 	ReviewComment,
@@ -101,6 +102,7 @@ import {
 } from "../git";
 import { githubAuthStatus, githubRefresh } from "../github";
 import { clampLimit, getHistoryIndex } from "../history";
+import { localesDir, readLocalLocales } from "../locales";
 import { logger } from "../log";
 import { openPr, previewPr } from "../pr";
 import {
@@ -771,6 +773,13 @@ const handlers: WsHandlers = {
 		return listSkillCatalog(ws.worktreePath, admissionContextFor(project, ws.skillOverrides ?? {}));
 	},
 	"extension.list": () => listExtensionCatalog(new Set(getConfig().disabledExtensions)),
+	"locales.list": () => readLocalLocales(),
+	"locales.reveal": () => {
+		const dir = localesDir();
+		mkdirSync(dir, { recursive: true });
+		revealInFileManager(dir);
+		return { ok: true } as const;
+	},
 	"project.acknowledgeSkills": (p) => {
 		return acknowledgeProjectSkills(p.id, p.names);
 	},
