@@ -35,7 +35,7 @@ translation logic: validation and file naming come from [[module-locales]].
 
 ## Get right
 
-- A broken file never blocks the others: invalid JSON (with line/column when the parser reports one), a
+- A broken file never blocks the others — including one whose validation throws: invalid JSON (with line/column when the parser reports one), a
   non-object root, an invalid file name, or an oversize file becomes an `ok: false` entry.
 - The watcher is best-effort: a watch failure logs and leaves `locales.list` correct on the next read.
   Bursts (editor save = write + rename) coalesce into one nudge.

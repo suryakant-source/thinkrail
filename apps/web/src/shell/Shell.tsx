@@ -7,7 +7,6 @@ import type { MessageKey } from "@thinkrail/locales";
 import { useT } from "@thinkrail/locales/react";
 import { IconTooltip } from "@thinkrail/ui/tooltip";
 import { useEffect, useState } from "react";
-import { useLocaleSync } from "../i18n";
 import { NotificationPermissionPrompt, useAttentionNotifications } from "../notifications";
 import { AnalyticsConsentDialog } from "../panels/AnalyticsConsentDialog";
 import { InterviewPromptDialog } from "../panels/InterviewPromptDialog";
@@ -60,7 +59,6 @@ const STATUS_DOT: Record<ConnectionStatus, string> = {
 export function Shell() {
 	const t = useT();
 	useLocalLayoutState();
-	useLocaleSync();
 	useAttentionNotifications();
 	const status = useAppStore((s) => s.status);
 	const analyticsConsentOpen = useAppStore(selectAnalyticsConsentPromptOpen);

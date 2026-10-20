@@ -76,3 +76,20 @@ test("the watcher creates the folder and nudges once per burst", async () => {
 		stop();
 	}
 });
+
+test("prototype-named keys stay data and never break a neighboring file", () => {
+	const dir = tempDir();
+	writeFileSync(
+		join(dir, "de.json"),
+		'{"constructor":"x","__proto__":"y","desktop.menu.edit":"Bearbeiten"}',
+	);
+	writeFileSync(join(dir, "fr.json"), '{"desktop.menu.edit":"Modifier"}');
+	const { files } = readLocalLocales(dir);
+	expect(files.map((file) => [file.fileName, file.ok])).toEqual([
+		["de.json", true],
+		["fr.json", true],
+	]);
+	const de = files[0];
+	expect(de?.ok && de.strings["desktop.menu.edit"]).toBe("Bearbeiten");
+	expect(Reflect.get(JSON.parse(JSON.stringify(de)).strings, "__proto__")).toBe("y");
+});

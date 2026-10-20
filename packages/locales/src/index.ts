@@ -75,12 +75,35 @@ function placeholders(text: string): string {
 	return [...names].sort().join("\u0000");
 }
 
+function markup(text: string): string | null {
+	const tags: string[] = [];
+	for (const match of text.matchAll(/<\/?[A-Za-z0-9][^<>]*>/g)) {
+		const tag = match[0];
+		if (!/^<\/?\d+\/?>$/.test(tag)) return null;
+		tags.push(tag);
+	}
+	return tags.sort().join("\u0000");
+}
+
+function own(catalog: Catalog, key: string): string | undefined {
+	return Object.hasOwn(catalog, key) ? catalog[key] : undefined;
+}
+
 function englishReference(key: string): string | undefined {
-	const exact = EN[key];
+	const exact = own(EN, key);
 	if (exact !== undefined) return exact;
 	if (!PLURAL_SUFFIX.test(key)) return undefined;
 	const base = key.replace(PLURAL_SUFFIX, "");
-	return EN[`${base}_other`] ?? EN[base];
+	return own(EN, `${base}_other`) ?? own(EN, base);
+}
+
+function acceptable(key: string, value: string): boolean {
+	if (value === "") return false;
+	const shape = markup(value);
+	if (shape === null) return false;
+	const reference = englishReference(key);
+	if (reference === undefined) return shape === "";
+	return placeholders(reference) === placeholders(value) && markup(reference) === shape;
 }
 
 export type CatalogValidation = { ok: true; strings: Catalog } | { ok: false; error: "not-object" };
@@ -89,14 +112,11 @@ export function validateCatalog(raw: unknown): CatalogValidation {
 	if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
 		return { ok: false, error: "not-object" };
 	}
-	const strings: Record<string, string> = {};
-	for (const [key, value] of Object.entries(raw)) {
-		if (typeof value !== "string") continue;
-		const reference = englishReference(key);
-		if (reference !== undefined && placeholders(reference) !== placeholders(value)) continue;
-		strings[key] = value;
-	}
-	return { ok: true, strings };
+	const entries = Object.entries(raw).filter(
+		(entry): entry is [string, string] =>
+			typeof entry[1] === "string" && acceptable(entry[0], entry[1]),
+	);
+	return { ok: true, strings: Object.fromEntries(entries) };
 }
 
 function matchAvailable(tag: string, available: readonly string[]): string | undefined {

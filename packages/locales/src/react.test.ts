@@ -32,3 +32,26 @@ test("an English overlay customizes the bundled catalog and can be removed", () 
 	applyLocale("en", {});
 	expect(t("desktop.menu.edit")).toBe("Edit");
 });
+
+test("<T> renders interpolated values as literal text, never as markup", async () => {
+	const { createElement } = await import("react");
+	const { renderToStaticMarkup } = await import("react-dom/server");
+	const { T } = await import("./react");
+	applyLocale("de", { de: { "settings.language.add.steps": "Lade <0>en.json</0> von {{base}}" } });
+	const markup = renderToStaticMarkup(
+		createElement(T, {
+			i18nKey: "settings.language.add.steps",
+			values: { base: "feature/<strong>main</strong> & co" },
+			components: [createElement("a", { key: "a", href: "https://github.com/" })],
+		}),
+	);
+	expect(markup).toBe(
+		'Lade <a href="https://github.com/">en.json</a> von feature/&lt;strong&gt;main&lt;/strong&gt; &amp; co',
+	);
+});
+
+test("prototype-named overlay keys never pollute objects", () => {
+	applyLocale("de", { de: JSON.parse('{"__proto__":{"polluted":"yes"},"constructor":"c"}') });
+	expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+	expect(t("desktop.menu.edit")).toBe("Edit");
+});

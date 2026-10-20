@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+	EN,
 	fallbackChain,
 	languageName,
 	localeTagFromFileName,
@@ -70,4 +71,55 @@ test("fallbackChain dedupes tag, base, English", () => {
 test("languageName uses the language's own name", () => {
 	expect(languageName("de")).toBe("Deutsch");
 	expect(languageName("en")).toBe("English");
+});
+
+describe("validateCatalog hardening", () => {
+	test("drops markup that differs from English or carries attributes", () => {
+		const result = validateCatalog({
+			"settings.language.add.steps": 'Get <0 href="https://attacker.example">en.json</0> now',
+			"desktop.menu.edit": "<b>Bearbeiten</b>",
+			"future.key": "<0>ok</0>",
+			"future.plain": "plain",
+		});
+		expect(result).toEqual({ ok: true, strings: { "future.plain": "plain" } });
+	});
+
+	test("keeps markup that matches English indexed tags", () => {
+		const result = validateCatalog({
+			"settings.language.add.steps": "Lade <0>en.json</0> herunter und übersetze die Werte.",
+		});
+		expect(result.ok && Object.keys(result.strings)).toEqual(["settings.language.add.steps"]);
+	});
+
+	test("a bare angle bracket in prose is text, not markup", () => {
+		const result = validateCatalog({
+			"lib.compactAge.underHour": "<1 год",
+			"future.math": "a < b",
+		});
+		expect(result.ok && Object.keys(result.strings).sort()).toEqual([
+			"future.math",
+			"lib.compactAge.underHour",
+		]);
+	});
+
+	test("drops empty strings so English shows through", () => {
+		expect(validateCatalog({ "desktop.menu.edit": "" })).toEqual({ ok: true, strings: {} });
+	});
+
+	test("inherited property names are ordinary unknown keys", () => {
+		const raw = JSON.parse(
+			'{"constructor":"a","toString":"b","__proto__":"c","hasOwnProperty":"d"}',
+		);
+		const result = validateCatalog(raw);
+		expect(result.ok).toBe(true);
+		if (!result.ok) return;
+		expect(Object.getPrototypeOf(result.strings)).toBe(Object.prototype);
+		expect(Object.hasOwn(result.strings, "__proto__")).toBe(true);
+		expect(Reflect.get(result.strings, "constructor")).toBe("a");
+	});
+});
+
+test("the bundled English catalog passes its own validation", () => {
+	const result = validateCatalog(EN);
+	expect(result.ok && Object.keys(result.strings).length).toBe(Object.keys(EN).length);
 });

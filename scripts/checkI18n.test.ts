@@ -44,3 +44,12 @@ test("the catalog must be sorted, non-empty, and referenced", () => {
 		"en.json keys are not sorted",
 	]);
 });
+
+test("descends into JSX passed through props and handlers inside attributes", () => {
+	expect(
+		texts(
+			'const A = () => <Row description={<p>Never translated</p>} control={<button aria-label="Delete everything" onClick={() => toast.error("Gone")}>Delete it</button>} />;',
+		),
+	).toEqual(["Never translated", "Delete everything", "Gone", "Delete it"]);
+	expect(texts('const A = () => <Row label="Name" />;')).toEqual(["Name"]);
+});

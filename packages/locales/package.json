@@ -5,7 +5,7 @@
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
-		"./react": "./src/react.ts",
+		"./react": "./src/react.tsx",
 		"./en.json": "./en.json"
 	},
 	"scripts": {
@@ -22,6 +22,7 @@
 	"devDependencies": {
 		"@types/bun": "catalog:",
 		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
 		"react": "catalog:",
 		"react-dom": "catalog:",
 		"typescript": "catalog:"

@@ -29,16 +29,21 @@ onto separate instances.
   - `localeTagFromFileName(name)` — `de.json` → `"de"`, canonicalized through `Intl.getCanonicalLocales`;
     `null` for a non-`.json`, dot-prefixed, or non-BCP-47 name.
   - `validateCatalog(raw)` — `{ ok: true, strings } | { ok: false, error: "not-object" }`. The value
-    must be a JSON object. Non-string values are dropped; a string for a known key whose
-    `{{placeholder}}` set differs from English's is dropped; unknown keys are kept (a file may be older or
-    newer than the app). Dropping is silent.
+    must be a JSON object. Dropped, silently: non-string and empty values (English shows instead); a string
+    for a known key whose `{{placeholder}}` set or indexed-markup set (`<0>`, `</0>`, `<1/>`) differs from
+    English's; any tag that is not a bare indexed marker (no attributes, no named tags — a catalog must not
+    override a code-owned component's props such as a link's `href`). Unknown keys are kept as data (a file
+    may be older or newer than the app); key lookups use own properties only, so `constructor` or
+    `__proto__` are ordinary keys. The bundled English catalog passes this same validation.
   - `resolveLocale(preference, available, systemLanguages)` — `"system"` walks `systemLanguages` and
     takes the first exact available tag, else its base language; an explicit tag is used only when
     available; otherwise `"en"`.
   - `baseLanguage(tag)` and `fallbackChain(tag)` (`[tag, base, "en"]`, deduped).
 - **`@thinkrail/locales/react`** (browser): the initialized i18next instance (`i18n`), `useT()` (typed
   `t` for components), `t` (the same function for pure modules, store actions and toasts — called at use
-  time, never at module load), `<T>` (react-i18next `Trans` for strings carrying markup), `currentLocale()`
+  time, never at module load), `<T>` (react-i18next `Trans` for strings carrying markup; it subscribes to
+  language changes and escapes interpolated values before markup is parsed, unescaping text nodes after, so
+  a value such as a branch named `feature/<b>x</b>` renders literally), `currentLocale()`
   for `Intl` formatting, and `applyLocale(tag, overlays)` which removes and re-adds `bundled ∪ overlay` for
   every chain member (so a deleted overlay's strings disappear) and switches language.
 
@@ -68,8 +73,8 @@ wording fix must not orphan translations. `en.json` stays sorted.
 - English output is the contract tests pin: a catalog edit that changes English wording is a product
   change, reviewed like one. Plural pairs carry real English singulars (`"1 group"`, never `"1 groups"`).
 - Text resolved outside React (layout `reason`s, default tab and terminal titles, renderer labels via
-  getters, `MCP_STATE_LABEL`) reads the language current at call time; long-lived non-React surfaces
-  (Monaco action labels, an open xterm's title) keep the language they were created in until recreated.
+  getters, `MCP_STATE_LABEL`) reads the language current at call time; the web client remounts its UI on a
+  language change so cached render output never keeps the old language ([[submodule-web-i18n]]).
 - Persisted or wire identifiers never carry translated text: built-in layout preset names translate only
   at render, a default terminal title is recognized in the current language and in English so numbering
   survives a switch, and markers matched on save (MCP's hidden-value placeholder) stay literal.

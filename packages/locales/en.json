@@ -153,6 +153,7 @@
 	"chat.composer.mode.queueMeaning": "runs after the agent finishes",
 	"chat.composer.mode.steer": "Steer",
 	"chat.composer.mode.steerMeaning": "delivers at the agent's next step",
+	"chat.composer.noTemplates": "No prompt templates yet — add starters in Settings → Templates",
 	"chat.composer.placeholder": "Message…",
 	"chat.composer.placeholderExpanded": "Message the agent…  (@ files · / commands)",
 	"chat.composer.placeholderStreaming": "Steer the agent at its next step…",

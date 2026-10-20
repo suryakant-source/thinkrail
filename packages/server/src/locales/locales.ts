@@ -50,7 +50,12 @@ function readLocaleFile(dir: string, fileName: string): LocalLocaleFile {
 	} catch (error) {
 		return failure(fileName, tag, "invalid-json", describe(error));
 	}
-	const result = validateCatalog(raw);
+	let result: ReturnType<typeof validateCatalog>;
+	try {
+		result = validateCatalog(raw);
+	} catch (error) {
+		return failure(fileName, tag, "unreadable", describe(error));
+	}
 	if (!result.ok) return failure(fileName, tag, result.error);
 	return { fileName, tag, ok: true, strings: { ...result.strings } };
 }

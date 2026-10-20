@@ -24,13 +24,23 @@ instance ([[module-locales]] `./react`). Components never do this themselves: th
   the effective-tag derivation (`resolveLocale` over the browser's `navigator.languages`, re-read on
   `languagechange`), and the one apply effect — install overlays, switch language, set `<html lang>`,
   push desktop menu labels through the optional `__THINKRAIL_NATIVE_MENU__` bridge (`pushNativeMenuLabels`).
-- **Public surface (barrel):** `useLocaleSync()` (mounted once by the shell), `useSystemLanguages()`,
-  and the pure `languageOptions`, `effectiveLocale`, `availableLocales`, `localOverlays`.
+- **Public surface (barrel):** `LocaleBoundary` (mounted once by `main.tsx` around the whole app),
+  `useSystemLanguages()`, `localeSignature`, and the pure `languageOptions`, `effectiveLocale`,
+  `availableLocales`, `localOverlays`.
 - **Allowed deps:** `store`, `@thinkrail/locales`, `@thinkrail/contracts` (types).
 - **Forbidden:** rendering UI (the Language page lives in `panels`), reading files, a second i18next
   instance.
 
 ## Get right
+
+- **A language or catalog change remounts the app subtree.** `LocaleBoundary` keys its children by a
+  revision that advances when the effective tag or the strings of its fallback chain change
+  (`localeSignature`; an unrelated file's edit does not count). The store, transport socket and host state
+  live outside React and survive; component-local state (an editor's cursor, a terminal's attachment) is
+  rebuilt the way StrictMode already exercises. Reason: the React Compiler caches render output by each
+  expression's own inputs, so text produced by `t` inside render helpers, getters (`MCP_STATE_LABEL`,
+  renderer `label`s) or memoized subtrees would otherwise stay in the old language. Rejected: threading the
+  hook's `t` through every render helper — dozens of modules with no tool to prove none was missed.
 
 - English is installed synchronously before first paint, so nothing renders keys while the host
   connects; local strings arrive later and re-render in place.

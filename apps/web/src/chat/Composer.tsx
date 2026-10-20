@@ -537,9 +537,7 @@ export const Composer = forwardRef<ComposerHandle, ComposerProps>(function Compo
 								className="flex w-full items-center gap-8 rounded-sm border-border-default border-t px-8 py-4 text-left text-text-muted tr-text-metadata hover:bg-control-bg-hovered hover:text-text-default"
 							>
 								<Sparkles className="size-12 shrink-0" />
-								<span className="truncate">
-									No prompt templates yet — add starters in Settings → Templates
-								</span>
+								<span className="truncate">{t("chat.composer.noTemplates")}</span>
 							</button>
 						) : null
 					}

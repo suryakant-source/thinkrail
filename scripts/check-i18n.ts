@@ -153,7 +153,6 @@ export function sourceViolations(path: string, source: string): Omit<I18nViolati
 					reportParts(value.expression, hasLetters);
 				}
 			}
-			return;
 		} else if (
 			ts.isJsxExpression(node) &&
 			node.expression &&

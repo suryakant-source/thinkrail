@@ -1,4 +1,5 @@
 import i18next from "i18next";
+import type { ComponentProps } from "react";
 import { initReactI18next, Trans, useTranslation } from "react-i18next";
 import { bundledCatalog, type Catalog, EN, type EnglishCatalog, fallbackChain } from "./index";
 
@@ -34,7 +35,19 @@ export function useT() {
 	return useTranslation().t;
 }
 
-export const T = Trans;
+export function T(props: ComponentProps<typeof Trans>) {
+	const { t: subscribed, i18n: instance } = useTranslation();
+	const tOptions = props.tOptions ?? {};
+	return (
+		<Trans
+			{...props}
+			t={subscribed}
+			i18n={instance}
+			tOptions={{ ...tOptions, interpolation: { ...tOptions.interpolation, escapeValue: true } }}
+			shouldUnescape
+		/>
+	);
+}
 
 export function currentLocale(): string {
 	return i18n.language || "en";
