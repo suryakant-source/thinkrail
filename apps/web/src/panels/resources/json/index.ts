@@ -1,8 +1,11 @@
+import { t } from "@thinkrail/locales/react";
 import type { ResourceRenderer } from "@/resources";
 
 export const jsonRenderer: ResourceRenderer = {
 	id: "thinkrail/json",
-	label: "Tree",
+	get label() {
+		return t("viewer.renderer.tree");
+	},
 	match: { glob: ["*.json", "*.jsonc"], text: true },
 	rank: 120,
 	capabilities: {

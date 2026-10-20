@@ -1,9 +1,12 @@
+import { t } from "@thinkrail/locales/react";
 import { isPhoneViewport } from "@/lib";
 import type { ResourceRenderer } from "@/resources";
 
 export const codeRenderer: ResourceRenderer = {
 	id: "thinkrail/code",
-	label: "Source",
+	get label() {
+		return t("viewer.renderer.source");
+	},
 	match: { text: true },
 	rank: 100,
 	capabilities: {

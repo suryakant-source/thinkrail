@@ -461,7 +461,7 @@ a project picker, the prompt hero, and the reused
   create dialog.) **`SettingsDialog`** is the app-settings surface the shell's topbar gear opens — a
   **store-driven two-pane shell**: one nav list, rendered once, beside a scrollable content pane. At `md`+
   the list is a rail grouped **Agent** (Models, Providers, MCP servers, Prompt templates) ·
-  **Interface** (Chat, Appearance, Layout, Terminal) · **System** (Workspaces, Integrations, Extensions,
+  **Interface** (Chat, Appearance, Language, Layout, Terminal) · **System** (Workspaces, Integrations, Extensions,
   Notifications, Privacy, Updates). Integrations keeps section id `github`: today it is the GitHub CLI page
   and it is the home for further integrations. Below `md` the same list is a horizontal scrolling strip without group labels. The
   Feedback card (`settings-nav-feedback`, “Get 100 credits for a user interview”) belongs to that list at
@@ -658,6 +658,16 @@ a project picker, the prompt hero, and the reused
   neither control. **`GithubSettings`** (the Integrations section's "Local GitHub" group —
   `github.authStatus()` shown as `settings-gh-status[data-connected]`: Connected + login, or a Not connected
   notice naming `gh auth login`; Refresh (`github.refresh`) is offered in both states);
+  **`LanguageSettings`** (gated by `LOCALES_PROTOCOL_VERSION`; a store-integrating container over the
+  props-driven `LanguagePage`, whose derivations come from [[submodule-web-i18n]]): one radio list — **System**
+  (default; names the language System resolves to) then every available language by its own-language name
+  with a source badge (*Built-in*, *Local file*, *Built-in, customized by local file*), then unselectable rows
+  for a selected-but-missing file (*File not found*; English renders, the choice is kept) and for each broken
+  file (its translated error code plus the untranslated parser detail). Selecting writes `settings.update
+  { locale }` and converges on the broadcast. *Add a language* gives the steps with a link to
+  `packages/locales/en.json` at `v<appVersion>` (released versions; `main` otherwise), the host's folder path
+  with **Copy path** and **Open folder** (`locales.reveal`, offered in every client like workspace reveal —
+  a remote browser uses the path), and a **How to contribute** link to CONTRIBUTING's Translations section);
   **`AppearanceSettings`** (the catalog-driven theme settings: a **Theme mode** segmented control,
   **System / Light / Dark** with System offered only from `THEME_SYSTEM_PROTOCOL_VERSION` (older hosts keep
   fixed-only behavior), and a **Contrast level** control, **Default / High**. Light/Dark write a fixed
@@ -1282,7 +1292,7 @@ own section. The kebab menu (`plan-menu`, a
   state renders content-shaped skeleton rows, never a bare "Loading…" line), `@thinkrail/ui/*` (incl. `popover`/`command`/`textarea` for the
   dialog), `chat` (`ModelEffortPicker` + the `useModelCatalog`/`useModelPreferences` hooks that feed it,
   reused by `NewWorkspaceDialog`; `ModelSelector`/`ThinkingSelector`, still mounted by
-  `ModelsSettings`; `modelPicker`'s `AUTH_KIND_LABEL`, the one connection-kind vocabulary
+  `ModelsSettings`; `modelPicker`'s `AUTH_KIND_LABEL`, the one connection-kind vocabulary (catalog keys)
   `ProvidersSettings` shares with the picker, and its `formatContext` plus `ProviderGlyph`, reused by
   `VisibleModelsSettings`' rows; `Markdown`,
   reused by `MarkdownPreview`; `TemplateEditorDialog`, reused by `TemplatesSettings`), `auth` (`LoginDialog`, mounted by

@@ -1,4 +1,5 @@
 import { sameModel, type WireModel } from "@thinkrail/contracts";
+import type { MessageKey } from "@thinkrail/locales";
 import type { ModelRef } from "@/store";
 import { groupByProvider, modelKey, type ProviderGroup } from "./modelPicker";
 
@@ -190,8 +191,7 @@ export const PROVIDER_GROUP =
 
 export const GROUPED_ROW = "ml-24";
 
-export const NO_MODELS_HINT =
-	"No models to show. Connect a provider, or show hidden models in Settings → Models → Visible models.";
+export const NO_MODELS_HINT = "chat.modelPicker.noModelsHint" satisfies MessageKey;
 
 export type PickerEmptyState = "no-match" | "no-models" | null;
 

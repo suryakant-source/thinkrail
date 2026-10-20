@@ -1,4 +1,5 @@
 import type { ReviewSendResult } from "@thinkrail/contracts";
+import { t } from "@thinkrail/locales/react";
 import {
 	type CenterNavigationStamp,
 	layoutOpenOptionsForNavigation,
@@ -46,7 +47,7 @@ export async function sendReviewComment(workspaceId: string, id: string): Promis
 		});
 		await showReviewChat(workspaceId, sent, navigation);
 	} catch (err) {
-		toast.error(errorText(err), "Couldn't send the comment");
+		toast.error(errorText(err), t("review.send.commentFailed"));
 		throw err;
 	}
 }
@@ -63,7 +64,7 @@ export async function sendReviewBatch(workspaceId: string, commentIds?: string[]
 			await showReviewChat(workspaceId, sent, navigation, index > 0);
 		}
 	} catch (err) {
-		toast.error(errorText(err), "Couldn't send the review");
+		toast.error(errorText(err), t("review.send.batchFailed"));
 		throw err;
 	}
 }

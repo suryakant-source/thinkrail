@@ -1,4 +1,5 @@
 import "./index.css";
+import { useT } from "@thinkrail/locales/react";
 import { TooltipProvider } from "@thinkrail/ui/tooltip";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -19,15 +20,22 @@ initModelVisibilityPersistence();
 initProjectExpansionPersistence();
 initNavigation();
 
+function App() {
+	const t = useT();
+	return (
+		<ErrorBoundary label={t("app.errorBoundary.label")}>
+			<TooltipProvider delayDuration={250} skipDelayDuration={400}>
+				<Shell />
+			</TooltipProvider>
+		</ErrorBoundary>
+	);
+}
+
 const root = document.getElementById("root");
 if (root) {
 	createRoot(root).render(
 		<StrictMode>
-			<ErrorBoundary label="app">
-				<TooltipProvider delayDuration={250} skipDelayDuration={400}>
-					<Shell />
-				</TooltipProvider>
-			</ErrorBoundary>
+			<App />
 		</StrictMode>,
 	);
 }

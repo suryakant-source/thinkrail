@@ -1,4 +1,5 @@
 import type { OpenBranchReview } from "@thinkrail/contracts";
+import { t } from "@thinkrail/locales/react";
 import { isOpenBranchReview } from "../../panels/useOpenBranchReview";
 
 export interface RemoteCounts {
@@ -23,15 +24,25 @@ export function reviewTone(review: OpenBranchReview): ReviewTone {
 	return review.state === "merged" ? "info" : review.state === "closed" ? "neutral" : "success";
 }
 
-export function reviewStateLabel(review: OpenBranchReview): "Open" | "Merged" | "Closed" {
-	return review.state === "merged" ? "Merged" : review.state === "closed" ? "Closed" : "Open";
+export function reviewStateLabel(review: OpenBranchReview): string {
+	return review.state === "merged"
+		? t("shell.location.review.merged")
+		: review.state === "closed"
+			? t("shell.location.review.closed")
+			: t("shell.location.review.open");
 }
 
 /** `PR #12` while open; `Merged #12` / `Closed #12` afterwards (MRs keep their `!`). */
 export function reviewChipLabel(review: OpenBranchReview): string {
 	const ref = `${review.kind === "pull-request" ? "#" : "!"}${review.number}`;
-	if (isOpenBranchReview(review)) return `${review.kind === "pull-request" ? "PR" : "MR"} ${ref}`;
-	return `${reviewStateLabel(review)} ${ref}`;
+	if (isOpenBranchReview(review)) {
+		return review.kind === "pull-request"
+			? t("shell.location.review.chipPr", { ref })
+			: t("shell.location.review.chipMr", { ref });
+	}
+	return review.state === "merged"
+		? t("shell.location.review.chipMerged", { ref })
+		: t("shell.location.review.chipClosed", { ref });
 }
 
 export function projectInitial(name: string): string {
@@ -40,5 +51,5 @@ export function projectInitial(name: string): string {
 }
 
 export function pluralCommits(count: number): string {
-	return `${count} commit${count === 1 ? "" : "s"}`;
+	return t("shell.location.commits", { count });
 }

@@ -93,7 +93,8 @@ not this module; the theme-aware highlighter remains app-local.
   shortcuts: `MODAL_LAYER_SELECTOR` + `hasLayer` (an open modal/dialog/alertdialog owns the keyboard)
   and `isTextEntryTarget` (inputs, textareas, selects and contenteditable keep their letters) —
   duck-typed on the target so it holds in DOM-less tests.
-- **Allowed deps:** React (the viewport subscription hook only);
+- **Allowed deps:** React (the viewport subscription hook only); `@thinkrail/locales` (the relative-time,
+  compact-age and MCP state labels, resolved in the active locale at call time);
   `@thinkrail/contracts` (types only for canonical messages and `McpServerState`; the layout-resource identity input is a local structural type); `shiki`/`@shikijs/*` (the per-file shiki modules only — never reachable
   through the barrel).
 - **Forbidden:** every app-internal module — this is a leaf.

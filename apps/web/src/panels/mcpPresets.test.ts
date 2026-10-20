@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { t } from "@thinkrail/locales/react";
 import {
 	importIssues,
 	mcpEntryErrors,
@@ -33,7 +34,7 @@ test("write-capable presets name what they can change, and the stdio preset is o
 	expect(byId.context7?.modifiesData).toBeUndefined();
 	expect(byId.deepwiki?.modifiesData).toBeUndefined();
 	expect(byId.linear?.entry).toEqual({ url: "https://mcp.linear.app/mcp/readonly" });
-	expect(byId.sentry?.modifiesData).toBe("Sentry");
+	expect(byId.sentry?.modifiesData && t(byId.sentry.modifiesData)).toBe("Sentry");
 	expect(byId.playwright).toMatchObject({
 		scope: "user",
 		optInPerProject: true,

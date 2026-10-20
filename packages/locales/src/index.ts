@@ -15,6 +15,15 @@ export const EN: Catalog = en;
 
 export const SYSTEM_LOCALE = "system";
 
+/** Keys the desktop app renders in its native menu; the web pushes their translations to it. */
+export const DESKTOP_MENU_KEYS = [
+	"desktop.menu.edit",
+	"desktop.menu.settings",
+	"desktop.menu.quit",
+	"desktop.menu.window",
+	"desktop.menu.close",
+] as const satisfies readonly (keyof EnglishCatalog)[];
+
 const BUNDLED: Readonly<Record<string, Catalog>> = { en: EN };
 
 export const BUNDLED_LOCALES: readonly string[] = Object.keys(BUNDLED);
@@ -74,11 +83,11 @@ function englishReference(key: string): string | undefined {
 	return EN[`${base}_other`] ?? EN[base];
 }
 
-export type CatalogValidation = { ok: true; strings: Catalog } | { ok: false; error: string };
+export type CatalogValidation = { ok: true; strings: Catalog } | { ok: false; error: "not-object" };
 
 export function validateCatalog(raw: unknown): CatalogValidation {
 	if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-		return { ok: false, error: "The file must contain a JSON object of strings." };
+		return { ok: false, error: "not-object" };
 	}
 	const strings: Record<string, string> = {};
 	for (const [key, value] of Object.entries(raw)) {

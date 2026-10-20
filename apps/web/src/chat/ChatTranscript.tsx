@@ -1,5 +1,7 @@
 import { RiArrowDownLine as ArrowDown, RiArrowUpLine as ArrowUp } from "@remixicon/react";
 import type { AskUserQuestionResult, GitDiffScope, TurnChangeSet } from "@thinkrail/contracts";
+import type { MessageKey } from "@thinkrail/locales";
+import { t as translate, useT } from "@thinkrail/locales/react";
 import { useModalLayerOpen } from "@thinkrail/ui/dialog";
 import { cn } from "@thinkrail/ui/utils";
 import {
@@ -148,6 +150,11 @@ export type ChatTranscriptHandle = {
 	cancelImmediateTurn: (streaming: boolean) => void;
 };
 
+const SCROLL_BUTTON_LABELS = {
+	"Follow response": "chat.transcript.followResponse",
+	Latest: "chat.transcript.latest",
+} as const satisfies Record<"Follow response" | "Latest", MessageKey>;
+
 /**
  * The churn-isolated transcript child: owns the per-delta transcript rendering (the Virtuoso list, scroll
  * control, completion-ack, location reveal, flash, ask-focus scope) and the streaming-runtime subscription.
@@ -192,6 +199,7 @@ const ChatTranscript = forwardRef<
 	},
 	ref,
 ) {
+	const t = useT();
 	const sessionExists = useAppStore((s) => s.sessions[sessionId] !== undefined);
 	// Subscribe only to the runtime fields the transcript renders from, so composer keystrokes
 	// (`draft`), stats/model/extUi churn, etc. no longer re-render the transcript subtree.
@@ -434,7 +442,7 @@ const ChatTranscript = forwardRef<
 				: currentTurns.findLast((t) => turnAnchorText(t).includes(prefix));
 		const index = target ? rowIndexForTurn(currentRows, target.id) : -1;
 		if (index === -1) {
-			toast.error("couldn't locate the message — the session may have changed");
+			toast.error(translate("chat.transcript.locateFailed"));
 			useAppStore.getState().clearChatLocation();
 			return;
 		}
@@ -455,8 +463,7 @@ const ChatTranscript = forwardRef<
 				activeChatLocationReveal.current = null;
 				if (useAppStore.getState().chatLocationRequest !== chatLocationRequest) return;
 				if (result === "found") setFlashRowId(rowId);
-				else if (result === "missing")
-					toast.error("couldn't locate the message — the session may have changed");
+				else if (result === "missing") toast.error(translate("chat.transcript.locateFailed"));
 				useAppStore.getState().clearChatLocation();
 			},
 		);
@@ -539,7 +546,7 @@ const ChatTranscript = forwardRef<
 	}, [pendingExtUiId]);
 	const extUiAnnouncement =
 		pendingExtUiRequest && announcedExtUiId === pendingExtUiRequest.id
-			? `Your input is needed: ${pendingExtUiRequest.title.split("\n")[0]}`
+			? t("chat.transcript.inputNeeded", { title: pendingExtUiRequest.title.split("\n")[0] })
 			: "";
 	const anchorToolCallId = pendingExtUiRequest?.toolCallId;
 	const promptOnToolCard =
@@ -702,7 +709,7 @@ const ChatTranscript = forwardRef<
 								) : (
 									<ArrowDown className="size-12" />
 								)}
-								{scrollButtonLabel}
+								{scrollButtonLabel ? t(SCROLL_BUTTON_LABELS[scrollButtonLabel]) : null}
 							</button>
 						) : null}
 						<span

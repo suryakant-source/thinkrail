@@ -60,6 +60,9 @@ What a `./web` half may import:
   (`@thinkrail/ui/dialog`) are retained for code-splitting. Design tokens stay in `apps/web/src/styles`;
   the SDK and extension web halves use token utility classes only, and the app's CSS `@source` and
   color/spacing/typography checks cover `packages/ui` and `thinkrail-extensions/*/web`.
+- `@thinkrail/locales/react` ([[module-locales]]) — `useT` / `<T>` / `t` over the one shared i18next
+  instance; an extension's UI text is keys in `packages/locales/en.json` under its own prefix
+  (`visualize.*`), held by `check:i18n` like the app.
 - **Not in the SDK (yet):** the highlighted `CodeBlock` and the shiki highlighter — not dependency-closed
   (highlighter → theme barrel). They move together with the generic CSS-variable shiki map when a second
   extension needs highlighting.

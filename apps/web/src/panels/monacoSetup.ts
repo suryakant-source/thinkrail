@@ -1,5 +1,6 @@
 import { loader } from "@monaco-editor/react";
 import { shikiToMonaco, textmateThemeToMonacoTheme } from "@shikijs/monaco";
+import { t } from "@thinkrail/locales/react";
 import { createHighlighterCore, type HighlighterCore, type ThemeRegistration } from "shiki/core";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import "monaco-editor/esm/vs/base/browser/ui/codicons/codicon/codicon.css";
@@ -92,7 +93,7 @@ export function fileEditorOptions(lineWidth: number, bounded: boolean, path: str
 	const paddingTop = Number.parseFloat(cssVar("--space-8") ?? "");
 	const options: editor.IStandaloneEditorConstructionOptions = {
 		readOnly: true,
-		readOnlyMessage: { value: "Files open read-only here — ask the agent to change them." },
+		readOnlyMessage: { value: t("panels.monacoSetup.readOnly") },
 		ariaLabel: path,
 		unicodeHighlight: { ambiguousCharacters: false },
 		lineNumbersMinChars: 3,

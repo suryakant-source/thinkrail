@@ -1,8 +1,11 @@
+import { t } from "@thinkrail/locales/react";
 import type { ResourceRenderer } from "@/resources";
 
 export const htmlRenderer: ResourceRenderer = {
 	id: "thinkrail/html",
-	label: "Preview",
+	get label() {
+		return t("viewer.renderer.preview");
+	},
 	match: { glob: ["*.html", "*.htm"], text: true },
 	rank: 120,
 	capabilities: {

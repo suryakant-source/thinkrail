@@ -1,23 +1,35 @@
 import type { McpServerState } from "@thinkrail/contracts";
+import type { MessageKey } from "@thinkrail/locales";
+import { t } from "@thinkrail/locales/react";
 
 export type McpStateTone = "success" | "working" | "warning" | "error" | "info" | "neutral";
 
-export const MCP_STATE_LABEL: Readonly<Record<McpServerState, string>> = {
-	starting: "Starting",
-	connected: "Connected",
-	"needs-sign-in": "Needs sign-in",
-	failed: "Failed",
-	disconnected: "Disconnected",
-	disabled: "Disabled",
-	"disabled-in-project": "Disabled in this project",
-	"disabled-in-chat": "Disabled in this chat",
-	"pending-approval": "Pending approval",
-	"invalid-config": "Invalid config",
-	"pending-reload": "Pending reload",
-	"not-running": "Not running",
-	"handled-elsewhere": "Handled elsewhere",
-	unknown: "Unknown",
-};
+const MCP_STATE_KEY = {
+	starting: "lib.mcpState.starting",
+	connected: "lib.mcpState.connected",
+	"needs-sign-in": "lib.mcpState.needsSignIn",
+	failed: "lib.mcpState.failed",
+	disconnected: "lib.mcpState.disconnected",
+	disabled: "lib.mcpState.disabled",
+	"disabled-in-project": "lib.mcpState.disabledInProject",
+	"disabled-in-chat": "lib.mcpState.disabledInChat",
+	"pending-approval": "lib.mcpState.pendingApproval",
+	"invalid-config": "lib.mcpState.invalidConfig",
+	"pending-reload": "lib.mcpState.pendingReload",
+	"not-running": "lib.mcpState.notRunning",
+	"handled-elsewhere": "lib.mcpState.handledElsewhere",
+	unknown: "common.unknown",
+} satisfies Record<McpServerState, MessageKey>;
+
+export const MCP_STATE_LABEL: Readonly<Record<McpServerState, string>> = Object.defineProperties(
+	{} as Record<McpServerState, string>,
+	Object.fromEntries(
+		Object.entries(MCP_STATE_KEY).map(([state, key]) => [
+			state,
+			{ enumerable: true, get: () => t(key) },
+		]),
+	),
+);
 
 const MCP_STATE_TONE: Readonly<Record<McpServerState, McpStateTone>> = {
 	starting: "working",
@@ -49,11 +61,11 @@ export function isMcpActiveState(state: McpServerState): boolean {
 }
 
 export function mcpToolCountLabel(count: number): string {
-	return `${count} tool${count === 1 ? "" : "s"}`;
+	return t("lib.mcpState.toolCount", { count });
 }
 
 export function mcpStatusLabel(state: McpServerState, toolCount?: number): string {
 	return state === "connected" && toolCount !== undefined
-		? `${MCP_STATE_LABEL.connected} · ${mcpToolCountLabel(toolCount)}`
+		? t("lib.mcpState.connectedWithTools", { count: toolCount })
 		: MCP_STATE_LABEL[state];
 }

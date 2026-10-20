@@ -4,7 +4,7 @@ import {
 	compactSubmissionError,
 	isModelCommand,
 	mergeNativeChatCommands,
-	NATIVE_CHAT_COMMANDS,
+	nativeChatCommands,
 	parseModelCommand,
 	parseNativeChatCommand,
 	prepareNameChatCommand,
@@ -106,7 +106,7 @@ describe("native chat command catalog", () => {
 			"skill:name",
 			"Compact",
 		]);
-		expect(merged[0]).toEqual(NATIVE_CHAT_COMMANDS[0]);
+		expect(merged[0]).toEqual(nativeChatCommands()[0]);
 		expect(merged[0]?.source).toBe("builtin");
 		expect(merged[1]?.source).toBe("builtin");
 		expect(mergeNativeChatCommands([command("name")], false).map(({ name }) => name)).toEqual([

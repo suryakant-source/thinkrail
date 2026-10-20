@@ -1,4 +1,5 @@
 import type { NativeQuitHint } from "@thinkrail/contracts";
+import { t } from "@thinkrail/locales/react";
 import { cn } from "@thinkrail/ui/utils";
 import { useState } from "react";
 import { platformShortcutLabel } from "../lib";
@@ -6,9 +7,9 @@ import { platformShortcutLabel } from "../lib";
 type VisibleQuitHint = Exclude<NativeQuitHint, "hidden">;
 
 function quitHintText(hint: VisibleQuitHint) {
-	if (hint === "release") return "Release to quit";
-	if (hint === "quitting") return "Quitting…";
-	return `Hold ${platformShortcutLabel("Q")} or press twice to quit`;
+	if (hint === "release") return t("shell.quitHint.release");
+	if (hint === "quitting") return t("shell.quitHint.quitting");
+	return t("shell.quitHint.hold", { shortcut: platformShortcutLabel("Q") });
 }
 
 export function QuitHintOverlay({ hint }: { hint: NativeQuitHint }) {

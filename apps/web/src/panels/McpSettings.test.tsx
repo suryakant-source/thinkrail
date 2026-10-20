@@ -120,16 +120,20 @@ function menuItems(value: McpServerRow): string[] {
 			visit(child.props.children);
 		});
 	};
-	visit(
-		McpServerRowView({
+	let tree: ReactNode = null;
+	const Capture = () => {
+		tree = McpServerRowView({
 			row: value,
 			view: mcpRowView(value, 0),
 			readOnly: false,
 			busy: false,
 			error: undefined,
 			onCommand: () => {},
-		}),
-	);
+		});
+		return null;
+	};
+	renderToStaticMarkup(<Capture />);
+	visit(tree);
 	return items;
 }
 

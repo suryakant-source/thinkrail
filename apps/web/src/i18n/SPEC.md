@@ -16,13 +16,17 @@ instance ([[module-locales]] `./react`). Components never do this themselves: th
 
 ## Boundary
 
+- **Hydration:** `transport` reads `locales.list` after each welcome from a v86+ host and again on every
+  `locales.changed` nudge, installing the snapshot with `installLocalLocales` (an older host installs
+  `null`, so only bundled languages exist). This module only derives from the store.
 - **Owns:** the `languageOptions` derivation (System + every available tag with its own-language name via
   `Intl.DisplayNames` and its source: `builtin`, `local`, `builtin+local`, or a broken/missing entry),
-  the effective-tag derivation (`resolveLocale`), and the one apply effect — install overlays, switch
-  language, set `<html lang>`, push desktop menu labels through the optional native bridge.
-- **Public surface (barrel):** `useLocaleSync()` (mounted once by the shell), `selectLanguageOptions`,
-  `selectEffectiveLocale`.
-- **Allowed deps:** `store`, `transport`, `@thinkrail/locales`, `@thinkrail/contracts`.
+  the effective-tag derivation (`resolveLocale` over the browser's `navigator.languages`, re-read on
+  `languagechange`), and the one apply effect — install overlays, switch language, set `<html lang>`,
+  push desktop menu labels through the optional `__THINKRAIL_NATIVE_MENU__` bridge (`pushNativeMenuLabels`).
+- **Public surface (barrel):** `useLocaleSync()` (mounted once by the shell), `useSystemLanguages()`,
+  and the pure `languageOptions`, `effectiveLocale`, `availableLocales`, `localOverlays`.
+- **Allowed deps:** `store`, `@thinkrail/locales`, `@thinkrail/contracts` (types).
 - **Forbidden:** rendering UI (the Language page lives in `panels`), reading files, a second i18next
   instance.
 

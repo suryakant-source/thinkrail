@@ -1,4 +1,5 @@
 import type { JbcentralQuotaSnapshot } from "@thinkrail/contracts";
+import { currentLocale } from "@thinkrail/locales/react";
 
 export type TimerHandle = ReturnType<typeof setTimeout> | number;
 
@@ -16,7 +17,11 @@ export interface JbcentralQuotaPolling {
 	stop(): void;
 }
 
-export function formatJbcentralQuota(remaining: number, total: number, locale?: string): string {
+export function formatJbcentralQuota(
+	remaining: number,
+	total: number,
+	locale: string = currentLocale(),
+): string {
 	const formatter = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 });
 	return `${formatter.format(remaining)} / ${formatter.format(total)}`;
 }

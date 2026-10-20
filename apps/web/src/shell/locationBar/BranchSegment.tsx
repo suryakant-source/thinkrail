@@ -7,6 +7,7 @@ import {
 	RiGitPullRequestLine as PullRequest,
 } from "@remixicon/react";
 import type { OpenBranchReview, Workspace } from "@thinkrail/contracts";
+import { T, useT } from "@thinkrail/locales/react";
 import { Popover, PopoverContent, PopoverTrigger } from "@thinkrail/ui/popover";
 import { IconTooltip } from "@thinkrail/ui/tooltip";
 import { cn } from "@thinkrail/ui/utils";
@@ -17,13 +18,7 @@ import { useBranchList } from "../../panels/branches";
 import { isOpenBranchReview, openReviewLabel } from "../../panels/useOpenBranchReview";
 import { isUserOwnedWorkspace, selectDiffBaseRef, toast, useAppStore } from "../../store";
 import { errorText, getTransport } from "../../transport";
-import {
-	pluralCommits,
-	remoteCounts,
-	reviewChipLabel,
-	reviewStateLabel,
-	reviewTone,
-} from "./locationModel";
+import { remoteCounts, reviewChipLabel, reviewStateLabel, reviewTone } from "./locationModel";
 import { chipClass, PillChevron, pillClass, Segment } from "./Segment";
 
 function Row({
@@ -60,6 +55,7 @@ export function BranchSegment({
 	review: OpenBranchReview | null;
 	reviewDetailsKnown: boolean;
 }) {
+	const t = useT();
 	const [open, setOpen] = useState(false);
 	const contentRef = useRef<HTMLDivElement>(null);
 	const diffBase = useAppStore((s) => selectDiffBaseRef(s, workspace.id));
@@ -70,15 +66,15 @@ export function BranchSegment({
 
 	const copyBranch = () => {
 		void copyText(workspace.branch).then((ok) => {
-			if (ok) toast.success(`Copied ${workspace.branch}`);
-			else toast.error("Couldn't write to the clipboard.");
+			if (ok) toast.success(t("shell.location.branch.copied", { branch: workspace.branch }));
+			else toast.error(t("shell.location.branch.clipboardFailed"));
 		});
 	};
 	const pointDiffBaseAt = async (ref: string) => {
 		try {
 			await getTransport().request("workspace.setDiffBase", { id: workspace.id, ref });
 		} catch (error) {
-			toast.error(`Could not change the compare target: ${errorText(error)}`);
+			toast.error(t("shell.location.branch.compareFailed", { error: errorText(error) }));
 		}
 	};
 
@@ -89,10 +85,14 @@ export function BranchSegment({
 				className="hidden max-w-[440px] shrink-[4] md:flex"
 				caption={
 					<>
-						Branch
+						{t("shell.location.branch.caption")}
 						{userOwned ? null : (
 							<span className="truncate">
-								· from <span data-testid="scope-base">{workspace.baseBranch}</span>
+								<T
+									i18nKey="shell.location.branch.fromBase"
+									values={{ base: workspace.baseBranch }}
+									components={[<span key="base" data-testid="scope-base" />]}
+								/>
 							</span>
 						)}
 					</>
@@ -100,7 +100,7 @@ export function BranchSegment({
 			>
 				<PopoverTrigger
 					data-testid="scope-branch-trigger"
-					aria-label={`Branch ${workspace.branch}`}
+					aria-label={t("shell.location.branch.label", { branch: workspace.branch })}
 					className={pillClass}
 				>
 					<GitBranch aria-hidden="true" className="size-14 shrink-0" />
@@ -111,7 +111,11 @@ export function BranchSegment({
 				</PopoverTrigger>
 			</Segment>
 			{remote ? (
-				<Segment testid="scope-remote-segment" caption="Remote" className="hidden shrink-0 md:flex">
+				<Segment
+					testid="scope-remote-segment"
+					caption={t("shell.location.remote.caption")}
+					className="hidden shrink-0 md:flex"
+				>
 					{remote.unpushed > 0 ? (
 						<button
 							type="button"
@@ -120,7 +124,7 @@ export function BranchSegment({
 							onClick={() => setOpen(true)}
 						>
 							<ArrowUp aria-hidden="true" />
-							{remote.unpushed} to push
+							{t("shell.location.remote.unpushedChip", { count: remote.unpushed })}
 						</button>
 					) : null}
 					{remote.behind > 0 ? (
@@ -131,7 +135,7 @@ export function BranchSegment({
 							onClick={() => setOpen(true)}
 						>
 							<ArrowDown aria-hidden="true" />
-							{remote.behind} behind
+							{t("shell.location.remote.behindChip", { count: remote.behind })}
 						</button>
 					) : null}
 				</Segment>
@@ -147,13 +151,13 @@ export function BranchSegment({
 				ref={contentRef}
 			>
 				<Row
-					label="Branch"
+					label={t("shell.location.branch.caption")}
 					action={
-						<IconTooltip label="Copy branch name">
+						<IconTooltip label={t("shell.location.branch.copyName")}>
 							<button
 								type="button"
 								data-testid="scope-branch-copy"
-								aria-label="Copy branch name"
+								aria-label={t("shell.location.branch.copyName")}
 								className={rowActionClass}
 								onClick={copyBranch}
 							>
@@ -165,11 +169,11 @@ export function BranchSegment({
 					<span className="truncate tr-code-text">{workspace.branch}</span>
 				</Row>
 				{userOwned ? null : (
-					<Row label="Based on">
+					<Row label={t("shell.location.branch.basedOn")}>
 						<span className="truncate tr-code-text">{workspace.baseBranch}</span>
 					</Row>
 				)}
-				<Row label="Compare to">
+				<Row label={t("shell.location.branch.compareTo")}>
 					<BranchPicker
 						branches={branches}
 						selected={diffBase}
@@ -184,7 +188,7 @@ export function BranchSegment({
 				{review ? (
 					<>
 						{isOpenBranchReview(review) && remoteStatus !== "unknown" ? (
-							<Row label="Remote">
+							<Row label={t("shell.location.remote.caption")}>
 								<span
 									data-testid="scope-remote-summary"
 									className={cn(
@@ -194,23 +198,35 @@ export function BranchSegment({
 								>
 									{remote
 										? [
-												remote.unpushed > 0 ? `${pluralCommits(remote.unpushed)} to push` : null,
-												remote.behind > 0 ? `${pluralCommits(remote.behind)} behind origin` : null,
+												remote.unpushed > 0
+													? t("shell.location.remote.unpushedCommits", { count: remote.unpushed })
+													: null,
+												remote.behind > 0
+													? t("shell.location.remote.behindCommits", { count: remote.behind })
+													: null,
 											]
 												.filter(Boolean)
 												.join(" · ")
-										: "In sync with origin"}
+										: t("shell.location.remote.inSync")}
 								</span>
 							</Row>
 						) : null}
 						<Row
-							label={review.kind === "pull-request" ? "Pull request" : "Merge request"}
+							label={
+								review.kind === "pull-request"
+									? t("shell.location.review.pullRequest")
+									: t("shell.location.review.mergeRequest")
+							}
 							action={
 								review.url ? (
-									<IconTooltip label={`Open ${openReviewLabel(review)}`}>
+									<IconTooltip
+										label={t("shell.location.review.openLink", { label: openReviewLabel(review) })}
+									>
 										<a
 											data-testid="scope-review-open"
-											aria-label={`Open ${openReviewLabel(review)}`}
+											aria-label={t("shell.location.review.openLink", {
+												label: openReviewLabel(review),
+											})}
 											href={review.url}
 											target="_blank"
 											rel="noreferrer"
@@ -234,7 +250,10 @@ export function BranchSegment({
 								)}
 							/>
 							<span className="truncate" data-testid="scope-review-state">
-								{openReviewLabel(review)} · {reviewStateLabel(review)}
+								{t("shell.location.review.stateLine", {
+									label: openReviewLabel(review),
+									state: reviewStateLabel(review),
+								})}
 							</span>
 						</Row>
 					</>
@@ -245,6 +264,7 @@ export function BranchSegment({
 }
 
 export function ReviewSegment({ review }: { review: OpenBranchReview }) {
+	const t = useT();
 	const label = reviewChipLabel(review);
 	const tone = reviewTone(review);
 	const chip = (
@@ -257,7 +277,11 @@ export function ReviewSegment({ review }: { review: OpenBranchReview }) {
 	return (
 		<Segment
 			testid="scope-review-segment"
-			caption={review.kind === "pull-request" ? "Pull request" : "Merge request"}
+			caption={
+				review.kind === "pull-request"
+					? t("shell.location.review.pullRequest")
+					: t("shell.location.review.mergeRequest")
+			}
 			className="hidden shrink-0 sm:flex"
 		>
 			{review.url ? (
@@ -267,7 +291,7 @@ export function ReviewSegment({ review }: { review: OpenBranchReview }) {
 					href={review.url}
 					target="_blank"
 					rel="noreferrer"
-					aria-label={`Open ${label}`}
+					aria-label={t("shell.location.review.openLink", { label })}
 					data-state-tone={tone}
 					className={chipClass(tone, true)}
 				>

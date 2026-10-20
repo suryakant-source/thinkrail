@@ -8,6 +8,7 @@ import {
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
+import { t } from "@thinkrail/locales/react";
 import {
 	type ImperativePanelGroupHandle,
 	ResizableHandle,
@@ -413,7 +414,7 @@ export function Workbench({
 			case "split":
 				result =
 					tab.kind === "tool"
-						? { reason: "Tools stay in a side region." }
+						? { reason: t("workbench.layout.toolsStayInSide") }
 						: splitCenterGroup(document, target.groupId, target.direction, tab);
 				break;
 			case "auxiliary-edge":
@@ -426,7 +427,7 @@ export function Workbench({
 								target.index,
 								target.region === "bottom" ? maxBottomGroups : maxSideGroups,
 							)
-						: { reason: "That tab type cannot move to an auxiliary region." };
+						: { reason: t("workbench.drag.tabTypeAuxiliary") };
 				break;
 		}
 		if (isLayoutUnavailable(result)) return;

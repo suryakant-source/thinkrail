@@ -27,8 +27,8 @@ import {
 	resizeSideGroups,
 	resizeSideRegion,
 	revealTool,
-	SEPARATE_PANES_REASON,
 	selectTab,
+	separatePanesReason,
 	setAuxiliaryGroupFolded,
 	setBottomAlignment,
 	setSideGroupFolded,
@@ -263,7 +263,7 @@ describe("workspace layout model", () => {
 		};
 		let document = baseDocument([file("one"), terminal]);
 		const intoToolPane = moveTabToGroup(document, terminal, { area: "right", groupId: "right-a" });
-		expect(intoToolPane).toEqual({ reason: SEPARATE_PANES_REASON });
+		expect(intoToolPane).toEqual({ reason: separatePanesReason() });
 		document = mutation(createAuxiliaryGroup(document, "right", terminal, 1, 6)).document;
 		const terminalPane = document.right.groups[1];
 		if (!terminalPane) throw new Error("Missing terminal pane fixture");
@@ -273,7 +273,7 @@ describe("workspace layout model", () => {
 		});
 		expect(
 			moveTabToGroup(document, toolTab("files"), { area: "right", groupId: terminalPane.id }),
-		).toEqual({ reason: SEPARATE_PANES_REASON });
+		).toEqual({ reason: separatePanesReason() });
 		const renamedTerminal = { ...terminal, name: "Build shell" };
 		document = mutation(openCenterTab(document, renamedTerminal, "center-a", "preview")).document;
 		expect(
@@ -568,11 +568,11 @@ describe("workspace layout model", () => {
 		const blocked = createSideGroup(document, "right", toolTab("changes"), 1, 1);
 		expect(isLayoutUnavailable(blocked)).toBe(true);
 		const retainedSource = createSideGroup(document, "right", toolTab("files"), 0, 1);
-		expect(retainedSource).toEqual({ reason: "This region is limited to 1 groups." });
+		expect(retainedSource).toEqual({ reason: "This region is limited to 1 group." });
 
 		let grown = mutation(createSideGroup(document, "right", toolTab("changes"), 1, 2)).document;
 		expect(createSideGroup(grown, "right", toolTab("files"), grown.right.groups.length, 1)).toEqual(
-			{ reason: "This region is limited to 1 groups." },
+			{ reason: "This region is limited to 1 group." },
 		);
 		expect(grown.right.groups).toHaveLength(2);
 		expect(grown.right.groups.map((group) => group.tabs[0]?.id)).toEqual([

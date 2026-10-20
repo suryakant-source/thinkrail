@@ -23,10 +23,13 @@ onto separate instances.
   - `EN` — the English catalog; `MessageKey` — its key union (plural suffixes `_one`/`_other`/… fold
     into the base key).
   - `BUNDLED_LOCALES` — the tags shipped with this build (`["en"]` today) and `bundledCatalog(tag)`.
+  - `SYSTEM_LOCALE` (`"system"`), `canonicalLocale(tag)`, `languageName(tag)` (own-language name via
+    `Intl.DisplayNames`, first letter upper-cased), and `DESKTOP_MENU_KEYS` — the keys the desktop's native
+    menu renders, one list for the desktop and the web that pushes their translations.
   - `localeTagFromFileName(name)` — `de.json` → `"de"`, canonicalized through `Intl.getCanonicalLocales`;
     `null` for a non-`.json`, dot-prefixed, or non-BCP-47 name.
-  - `validateCatalog(raw)` — `{ ok: true, strings } | { ok: false, error }`. The value must be a JSON
-    object (else a file-level error). Non-string values are dropped; a string for a known key whose
+  - `validateCatalog(raw)` — `{ ok: true, strings } | { ok: false, error: "not-object" }`. The value
+    must be a JSON object. Non-string values are dropped; a string for a known key whose
     `{{placeholder}}` set differs from English's is dropped; unknown keys are kept (a file may be older or
     newer than the app). Dropping is silent.
   - `resolveLocale(preference, available, systemLanguages)` — `"system"` walks `systemLanguages` and
@@ -34,9 +37,10 @@ onto separate instances.
     available; otherwise `"en"`.
   - `baseLanguage(tag)` and `fallbackChain(tag)` (`[tag, base, "en"]`, deduped).
 - **`@thinkrail/locales/react`** (browser): the initialized i18next instance (`i18n`), `useT()` (typed
-  `t`), `<T>` (react-i18next `Trans` for strings carrying markup), `currentLocale()` for `Intl`
-  formatting, and `applyLocale(tag, overlays)` which installs `bundled[tag] ∪ overlays[tag]` per chain
-  member and switches language.
+  `t` for components), `t` (the same function for pure modules, store actions and toasts — called at use
+  time, never at module load), `<T>` (react-i18next `Trans` for strings carrying markup), `currentLocale()`
+  for `Intl` formatting, and `applyLocale(tag, overlays)` which removes and re-adds `bundled ∪ overlay` for
+  every chain member (so a deleted overlay's strings disappear) and switches language.
 
 ## Format
 
@@ -58,3 +62,20 @@ wording fix must not orphan translations. `en.json` stays sorted.
   `packages/server` and `apps/desktop` (root only).
 - **Forbidden:** wire types, transport, stores, file-system access (the host reads files), any
   knowledge of where local files live.
+
+## Get right
+
+- English output is the contract tests pin: a catalog edit that changes English wording is a product
+  change, reviewed like one. Plural pairs carry real English singulars (`"1 group"`, never `"1 groups"`).
+- Text resolved outside React (layout `reason`s, default tab and terminal titles, renderer labels via
+  getters, `MCP_STATE_LABEL`) reads the language current at call time; long-lived non-React surfaces
+  (Monaco action labels, an open xterm's title) keep the language they were created in until recreated.
+- Persisted or wire identifiers never carry translated text: built-in layout preset names translate only
+  at render, a default terminal title is recognized in the current language and in English so numbering
+  survives a switch, and markers matched on save (MCP's hidden-value placeholder) stay literal.
+
+## Deferred
+
+Bundled non-English catalogs (the `BUNDLED` map is the seam), RTL layout (`dir`), a first-paint locale
+hint (until the host answers `locales.list`, a local language renders English for a moment), and
+translating server error text (errors would move to codes the client renders).

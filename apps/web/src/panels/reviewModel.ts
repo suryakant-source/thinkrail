@@ -1,4 +1,11 @@
-import type { GitDiffScope, ReviewAnchor, ReviewComment } from "@thinkrail/contracts";
+import type {
+	GitDiffScope,
+	ReviewAnchor,
+	ReviewComment,
+	ReviewCommentStatus,
+} from "@thinkrail/contracts";
+import type { MessageKey } from "@thinkrail/locales";
+import { t } from "@thinkrail/locales/react";
 import { anchorLabel, type ReviewThread } from "@/resources";
 
 export type ReviewSurface = { kind: "file" } | { kind: "diff"; scope?: GitDiffScope };
@@ -60,21 +67,31 @@ export function statusLabel(
 	return comment.status;
 }
 
-export function threadLabel(t: Pick<ReviewThread, "status" | "anchorState" | "stale">): string {
-	if (t.stale) return `${t.status} · stale`;
-	if (t.anchorState === "outdated") return `${t.status} · outdated`;
-	return t.status;
+const STATUS_KEYS = {
+	draft: "review.status.draft",
+	sent: "review.status.sent",
+	resolved: "review.status.resolved",
+	dismissed: "review.status.dismissed",
+} satisfies Record<ReviewCommentStatus, MessageKey>;
+
+export function threadLabel(
+	thread: Pick<ReviewThread, "status" | "anchorState" | "stale">,
+): string {
+	const status = t(STATUS_KEYS[thread.status]);
+	if (thread.stale) return t("review.thread.stale", { status });
+	if (thread.anchorState === "outdated") return t("review.thread.outdated", { status });
+	return status;
 }
 
 export function outdatedReason(anchor: ReviewAnchor | null | undefined): string {
 	const kinds = new Set((anchor?.selectors ?? []).map((selector) => selector.kind));
 	if (kinds.has("textQuote")) {
-		return "The file changed or is gone, and this comment's text was not found again; it keeps its original snapshot.";
+		return t("review.outdated.textQuote");
 	}
 	if (kinds.has("region") || kinds.has("structural") || kinds.has("lineRange")) {
-		return "The file's bytes changed or it is gone; a position in an image, PDF or notebook cannot be re-verified, so the comment keeps its original snapshot.";
+		return t("review.outdated.region");
 	}
-	return "The file this comment was about is gone.";
+	return t("review.outdated.gone");
 }
 
 export type ReviewFlag = "draft" | "sent";

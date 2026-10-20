@@ -7,6 +7,7 @@ import {
 	RiCloseLine as X,
 } from "@remixicon/react";
 import type { ToolRenderProps, ToolStatus } from "@thinkrail/extension-api/web";
+import { t as translate, useT } from "@thinkrail/locales/react";
 import { cn } from "@thinkrail/ui/utils";
 import { useContext } from "react";
 import type { ActivityBreadcrumbKind } from "./activityBreadcrumbs";
@@ -111,12 +112,13 @@ export function ThinkingGroup({
 	workspaceRoot?: string | undefined;
 	onOpenFile?: ((path: string) => void) | undefined;
 }) {
+	const t = useT();
 	const summary =
 		tools.length > 0
 			? live
 				? liveActivityTicker(tools, workspaceRoot)
 				: summarizeSteps(tools)
-			: `${formatChars(thought.text.length)} chars`;
+			: t("chat.activity.chars", { chars: formatChars(thought.text.length) });
 	return (
 		<GroupDisclosure
 			id={id}
@@ -126,9 +128,9 @@ export function ThinkingGroup({
 			live={live}
 			stepCount={tools.length}
 			icon={<Brain className="size-12 shrink-0" />}
-			label="Thinking"
+			label={t("chat.activity.thinking")}
 			headline={extractThinkingHeading(thought.text)}
-			breadcrumbLabel="Thinking"
+			breadcrumbLabel={t("chat.activity.thinking")}
 			breadcrumbMeta={summary}
 			summary={summary}
 			awaiting={
@@ -310,22 +312,22 @@ export function summarizeSteps(steps: ActivityStep[]): string {
 	const flatSteps = flattenActivitySteps(steps);
 	const counts = new Map<string, number>();
 	for (const step of flatSteps) {
-		const name = step.kind === "thinking" ? "thinking" : step.toolName;
+		const name = step.kind === "thinking" ? translate("chat.activity.thinkingStep") : step.toolName;
 		counts.set(name, (counts.get(name) ?? 0) + 1);
 	}
 	const names = [...counts.entries()].map(([name, n]) => (n > 1 ? `${name} ×${n}` : name));
 	const MAX_NAMES = 4;
 	const shown = names.slice(0, MAX_NAMES).join(", ");
 	const more = names.length - MAX_NAMES;
-	const count = `${flatSteps.length} ${flatSteps.length === 1 ? "step" : "steps"}`;
-	return `${count} · ${shown}${more > 0 ? `, +${more} more` : ""}`;
+	const count = translate("chat.activity.steps", { count: flatSteps.length });
+	return `${count} · ${more > 0 ? translate("chat.activity.moreNames", { names: shown, count: more }) : shown}`;
 }
 
 function liveActivityTicker(steps: ActivityStep[], workspaceRoot: string | undefined): string {
 	const flatSteps = flattenActivitySteps(steps);
 	const current = flatSteps[flatSteps.length - 1];
-	if (!current) return "Working…";
-	if (current.kind === "thinking") return "Thinking…";
+	if (!current) return translate("chat.activity.working");
+	if (current.kind === "thinking") return translate("chat.activity.thinkingLive");
 	const summary = getToolSummary(current.toolName, toolRenderProps(current, workspaceRoot));
 	return summary ? `${current.toolName} · ${summary}` : `${current.toolName}…`;
 }
