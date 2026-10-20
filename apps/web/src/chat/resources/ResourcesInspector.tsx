@@ -11,7 +11,7 @@ import type {
 	McpServerResourceSummary,
 	SubagentResourceSummary,
 } from "@thinkrail/contracts";
-import { t as translate, useT } from "@thinkrail/locales/react";
+import { type Translator, useT } from "@thinkrail/locales/react";
 import { Button } from "@thinkrail/ui/button";
 import { Dialog, DialogPanel, DialogTitle } from "@thinkrail/ui/dialog";
 import { cn } from "@thinkrail/ui/utils";
@@ -66,11 +66,11 @@ export interface ResourcesInspectorProps {
 
 const ESCAPE_KEY = "Esc";
 
-function formatAgo(ms: number): string {
+function formatAgo(t: Translator, ms: number): string {
 	const minutes = Math.floor(ms / 60_000);
-	if (minutes < 1) return translate("resources.ago.justNow");
-	if (minutes < 60) return translate("resources.ago.minutes", { minutes });
-	return translate("resources.ago.hours", { hours: Math.floor(minutes / 60) });
+	if (minutes < 1) return t("resources.ago.justNow");
+	if (minutes < 60) return t("resources.ago.minutes", { minutes });
+	return t("resources.ago.hours", { hours: Math.floor(minutes / 60) });
 }
 
 function DetailHeader({
@@ -94,7 +94,7 @@ function DetailHeader({
 		resource.kind === "command"
 			? resource.summary.startedAt
 			: Date.parse(resource.summary.createdAt);
-	const elapsed = elapsedLabel(resource, now);
+	const elapsed = elapsedLabel(t, resource, now);
 	const exitCode = resource.kind === "command" ? resource.summary.exitCode : undefined;
 	const reason =
 		resource.kind === "command" ? resource.summary.errorMessage : resource.summary.abortReason;
@@ -102,8 +102,8 @@ function DetailHeader({
 		<div className="flex shrink-0 flex-col gap-8 border-border-muted border-b p-12">
 			<div className="flex min-w-0 items-center gap-8">
 				<KindGlyph kind={resource.kind} state={state} />
-				<span className="min-w-0 truncate tr-title-dialog" title={resourceName(resource)}>
-					{resourceName(resource)}
+				<span className="min-w-0 truncate tr-title-dialog" title={resourceName(t, resource)}>
+					{resourceName(t, resource)}
 				</span>
 				<StateText state={state} kind={resource.kind} />
 				<span className="flex-1" />
@@ -134,7 +134,7 @@ function DetailHeader({
 								? t("resources.detail.started")
 								: t("resources.detail.created")}
 						</dt>
-						<dd>{formatAgo(now - started)}</dd>
+						<dd>{formatAgo(t, now - started)}</dd>
 					</div>
 				) : null}
 				{elapsed ? (

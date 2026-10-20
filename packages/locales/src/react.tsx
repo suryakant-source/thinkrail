@@ -1,6 +1,6 @@
-import i18next from "i18next";
-import type { ComponentProps } from "react";
-import { initReactI18next, Trans, useTranslation } from "react-i18next";
+import i18next, { type TFunction } from "i18next";
+import { type ComponentProps, useSyncExternalStore } from "react";
+import { Trans } from "react-i18next";
 import { bundledCatalog, type Catalog, EN, type EnglishCatalog, fallbackChain } from "./index";
 
 declare module "i18next" {
@@ -17,32 +17,59 @@ const NAMESPACE = "translation";
 
 export const i18n = i18next.createInstance();
 
-void i18n.use(initReactI18next).init({
+void i18n.init({
 	lng: "en",
 	fallbackLng: (code: string) => fallbackChain(code).slice(1),
+	load: "currentOnly",
 	resources: { en: { [NAMESPACE]: EN } },
 	initAsync: false,
 	keySeparator: false,
 	nsSeparator: false,
 	returnEmptyString: false,
 	interpolation: { escapeValue: false },
-	react: { bindI18nStore: "added removed", useSuspense: false },
 });
 
 export const t = i18n.t.bind(i18n);
 
-export function useT() {
-	return useTranslation().t;
+export type Translator = TFunction<"translation">;
+
+const languages = new WeakMap<Translator, string>();
+
+function createTranslator(): Translator {
+	const created = i18n.getFixedT(null, NAMESPACE);
+	languages.set(created, i18n.language || "en");
+	return created;
+}
+
+let translator: Translator = createTranslator();
+const listeners = new Set<() => void>();
+
+function subscribeLocale(listener: () => void): () => void {
+	listeners.add(listener);
+	return () => listeners.delete(listener);
+}
+
+export function currentTranslator(): Translator {
+	return translator;
+}
+
+function publishLocaleChange(): void {
+	translator = createTranslator();
+	for (const listener of listeners) listener();
+}
+
+export function useT(): Translator {
+	return useSyncExternalStore(subscribeLocale, currentTranslator, currentTranslator);
 }
 
 export function T(props: ComponentProps<typeof Trans>) {
-	const { t: subscribed, i18n: instance } = useTranslation();
+	const translate = useT();
 	const tOptions = props.tOptions ?? {};
 	return (
 		<Trans
 			{...props}
-			t={subscribed}
-			i18n={instance}
+			t={translate}
+			i18n={i18n}
 			tOptions={{ ...tOptions, interpolation: { ...tOptions.interpolation, escapeValue: true } }}
 			shouldUnescape
 		/>
@@ -51,6 +78,10 @@ export function T(props: ComponentProps<typeof Trans>) {
 
 export function currentLocale(): string {
 	return i18n.language || "en";
+}
+
+export function localeOf(translate: Translator): string {
+	return languages.get(translate) ?? currentLocale();
 }
 
 export type LocaleOverlays = Readonly<Record<string, Catalog>>;
@@ -70,4 +101,5 @@ export function applyLocale(tag: string, overlays: LocaleOverlays): void {
 	}
 	touched = languages;
 	if (i18n.language !== tag) void i18n.changeLanguage(tag);
+	publishLocaleChange();
 }

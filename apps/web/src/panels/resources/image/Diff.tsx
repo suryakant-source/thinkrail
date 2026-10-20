@@ -1,4 +1,4 @@
-import { t as translate, useT } from "@thinkrail/locales/react";
+import { type Translator, useT } from "@thinkrail/locales/react";
 import { useEffect, useRef, useState } from "react";
 import type { ResourceContent, ResourceDiffProps } from "@/resources";
 import type { Size } from "../regionReview";
@@ -50,15 +50,16 @@ function ImageContent({
 	);
 }
 
-function caption(side: "old" | "new", size: Size | null, content: ResourceContent): string {
-	const dimensions = size
-		? `${size.width} × ${size.height}`
-		: translate("viewer.image.noDimensions");
+function caption(
+	t: Translator,
+	side: "old" | "new",
+	size: Size | null,
+	content: ResourceContent,
+): string {
+	const dimensions = size ? `${size.width} × ${size.height}` : t("viewer.image.noDimensions");
 	const bytes =
-		content.kind === "bytes"
-			? formatByteLength(content.byteLength)
-			: translate("viewer.image.noImage");
-	return translate(side === "old" ? "viewer.side.oldCaption" : "viewer.side.newCaption", {
+		content.kind === "bytes" ? formatByteLength(t, content.byteLength) : t("viewer.image.noImage");
+	return t(side === "old" ? "viewer.side.oldCaption" : "viewer.side.newCaption", {
 		detail: `${dimensions} · ${bytes}`,
 	});
 }
@@ -97,7 +98,7 @@ export default function ImageDiff({
 				onSize={setLoadedOriginal}
 			/>
 		),
-		caption: caption("old", originalSize, original),
+		caption: caption(t, "old", originalSize, original),
 		intrinsicSize: originalSize,
 		review: review?.base,
 	};
@@ -111,7 +112,7 @@ export default function ImageDiff({
 				onSize={setLoadedModified}
 			/>
 		),
-		caption: caption("new", modifiedSize, modified),
+		caption: caption(t, "new", modifiedSize, modified),
 		intrinsicSize: modifiedSize,
 		review: review?.worktree,
 	};

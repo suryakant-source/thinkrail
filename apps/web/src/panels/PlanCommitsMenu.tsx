@@ -74,7 +74,7 @@ export function PlanCommitsMenu({
 							<span className="truncate tr-text-metadata text-text-muted">
 								{commit.shortSha} · {commit.author}
 								{commit.committedAt
-									? ` · ${relativeTime(Date.parse(commit.committedAt), now)}`
+									? ` · ${relativeTime(t, Date.parse(commit.committedAt), now)}`
 									: ""}
 							</span>
 						</span>

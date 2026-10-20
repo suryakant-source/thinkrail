@@ -5,7 +5,7 @@ import type {
 	ReviewCommentStatus,
 } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 import { anchorLabel, type ReviewThread } from "@/resources";
 
 export type ReviewSurface = { kind: "file" } | { kind: "diff"; scope?: GitDiffScope };
@@ -75,6 +75,7 @@ const STATUS_KEYS = {
 } satisfies Record<ReviewCommentStatus, MessageKey>;
 
 export function threadLabel(
+	t: Translator,
 	thread: Pick<ReviewThread, "status" | "anchorState" | "stale">,
 ): string {
 	const status = t(STATUS_KEYS[thread.status]);
@@ -83,7 +84,7 @@ export function threadLabel(
 	return status;
 }
 
-export function outdatedReason(anchor: ReviewAnchor | null | undefined): string {
+export function outdatedReason(t: Translator, anchor: ReviewAnchor | null | undefined): string {
 	const kinds = new Set((anchor?.selectors ?? []).map((selector) => selector.kind));
 	if (kinds.has("textQuote")) {
 		return t("review.outdated.textQuote");

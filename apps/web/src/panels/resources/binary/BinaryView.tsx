@@ -1,15 +1,15 @@
-import { currentLocale, t as translate, useT } from "@thinkrail/locales/react";
+import { localeOf, type Translator, useT } from "@thinkrail/locales/react";
 import type { ResourceViewProps } from "@/resources";
 
 function fileName(path: string): string {
 	return path.split("/").at(-1) ?? path;
 }
 
-function byteSize(bytes: number | undefined): string {
-	if (bytes === undefined) return translate("viewer.fileInfo.unknownSize");
-	return translate("viewer.binary.bytes", {
+function byteSize(t: Translator, bytes: number | undefined): string {
+	if (bytes === undefined) return t("viewer.fileInfo.unknownSize");
+	return t("viewer.binary.bytes", {
 		count: bytes,
-		size: bytes.toLocaleString(currentLocale()),
+		size: bytes.toLocaleString(localeOf(t)),
 	});
 }
 
@@ -25,7 +25,7 @@ export default function BinaryView({ resource, content }: ResourceViewProps) {
 				<h2 className="truncate tr-title-entity text-text-default">{fileName(resource.path)}</h2>
 				<dl className="mt-12 grid grid-cols-[auto_1fr] gap-x-12 gap-y-4 tr-text-metadata text-text-muted">
 					<dt>{t("viewer.fileInfo.size")}</dt>
-					<dd>{byteSize(bytes?.byteLength ?? resource.byteLength)}</dd>
+					<dd>{byteSize(t, bytes?.byteLength ?? resource.byteLength)}</dd>
 					<dt>{t("viewer.fileInfo.hash")}</dt>
 					<dd className="truncate tr-code-text">
 						{bytes ? bytes.hash.slice(0, 12) : t("viewer.binary.unavailable")}

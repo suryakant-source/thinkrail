@@ -1,11 +1,8 @@
-import { t } from "@thinkrail/locales/react";
 import type { ResourceRenderer } from "@/resources";
 
 export const csvRenderer: ResourceRenderer = {
 	id: "thinkrail/csv",
-	get label() {
-		return t("viewer.renderer.table");
-	},
+	labelKey: "viewer.renderer.table",
 	match: { glob: ["*.csv", "*.tsv"], text: true },
 	rank: 120,
 	capabilities: {

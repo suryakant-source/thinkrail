@@ -132,8 +132,8 @@ function SpecNodeRow({
 	const [expanded, setExpanded] = useState(true);
 	const isActive = activeFilePath === node.path;
 	const isMainSpec = depth === 0 && node.type === "goal-and-requirements";
-	const role = specRoleLabel(node.type);
-	const trailingRole = isMainSpec ? t("panels.specs.mainSpec") : specRoleTag(node.type);
+	const role = specRoleLabel(t, node.type);
+	const trailingRole = isMainSpec ? t("panels.specs.mainSpec") : specRoleTag(t, node.type);
 	const DocumentIcon = specRoleIcon(node.type, isActive || isMainSpec);
 	const Chevron = expanded ? ChevronDown : ChevronRight;
 

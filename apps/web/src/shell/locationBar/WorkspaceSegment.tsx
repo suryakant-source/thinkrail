@@ -341,7 +341,7 @@ export function WorkspaceSegment({
 											{isExternalWorkspace(candidate) ? <FolderOpen /> : <GitBranch />}
 											<span className="truncate">{candidate.name}</span>
 											<span className="ml-auto shrink-0 pl-8 text-text-subtle tr-text-caption">
-												{settledReasonLabel(reason, partition.now)}
+												{settledReasonLabel(t, reason, partition.now)}
 											</span>
 										</DropdownMenuItem>
 									))}

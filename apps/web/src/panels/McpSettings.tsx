@@ -16,7 +16,7 @@ import type {
 	Workspace,
 } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { t as translate, useT } from "@thinkrail/locales/react";
+import { currentTranslator, t as translate, useT } from "@thinkrail/locales/react";
 import { Button } from "@thinkrail/ui/button";
 import {
 	DropdownMenu,
@@ -506,7 +506,7 @@ function ExposureMenu({
 						"inline-flex items-center gap-2 outline-none hover:bg-control-bg-hovered hover:text-text-default focus-visible:ring-2 focus-visible:ring-primary disabled:text-control-disabled-text disabled:hover:bg-transparent",
 					)}
 				>
-					{mcpExposureLabel(summary.effectiveExposure)}
+					{mcpExposureLabel(t, summary.effectiveExposure)}
 					<ChevronDown className="size-12" />
 				</button>
 			</DropdownMenuTrigger>
@@ -536,7 +536,7 @@ function ExposureMenu({
 								<span aria-hidden className="size-14 shrink-0" />
 							)}
 							<span className="flex flex-col gap-2">
-								<span>{mcpExposureLabel(exposure)}</span>
+								<span>{mcpExposureLabel(t, exposure)}</span>
 								<span className="text-text-muted tr-text-metadata">
 									{t(MCP_EXPOSURE_HINT[exposure])}
 								</span>
@@ -771,7 +771,12 @@ function McpWorkspaceSettings({ workspace }: { workspace: Workspace }) {
 					try {
 						await request(sessionId);
 					} catch (error) {
-						const chat = selectChatTitle(useAppStore.getState(), workspaceId, sessionId);
+						const chat = selectChatTitle(
+							currentTranslator(),
+							useAppStore.getState(),
+							workspaceId,
+							sessionId,
+						);
 						failures.push({ chat, error: errorText(error) });
 					}
 				}
@@ -941,7 +946,7 @@ function McpWorkspaceSettings({ workspace }: { workspace: Workspace }) {
 					className="flex items-start gap-8 rounded-sm border border-border-default border-l-[3px] border-l-feedback-warning bg-feedback-warning-subtle px-12 py-8 text-text-default tr-text-metadata"
 				>
 					<TriangleAlert className="mt-2 size-14 shrink-0 text-feedback-warning" />
-					{mcpHandledElsewhereText(handledElsewhere.by)}
+					{mcpHandledElsewhereText(t, handledElsewhere.by)}
 				</p>
 			) : null}
 			{!trusted ? (
@@ -986,7 +991,7 @@ function McpWorkspaceSettings({ workspace }: { workspace: Workspace }) {
 						<McpServerRowView
 							key={row.key}
 							row={row}
-							view={mcpRowView(row, now)}
+							view={mcpRowView(t, row, now)}
 							readOnly={readOnly}
 							busy={!!busy[row.key] || loginBusy}
 							error={rowErrorText(rowErrors[row.key], row.state)}
@@ -1062,7 +1067,7 @@ function McpWorkspaceSettings({ workspace }: { workspace: Workspace }) {
 			{detailRow ? (
 				<McpDetailsDialog
 					row={detailRow}
-					view={mcpRowView(detailRow, now)}
+					view={mcpRowView(t, detailRow, now)}
 					onClose={() => setDetails(null)}
 				/>
 			) : null}

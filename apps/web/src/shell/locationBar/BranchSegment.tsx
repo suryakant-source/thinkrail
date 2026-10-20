@@ -252,7 +252,7 @@ export function BranchSegment({
 							<span className="truncate" data-testid="scope-review-state">
 								{t("shell.location.review.stateLine", {
 									label: openReviewLabel(review),
-									state: reviewStateLabel(review),
+									state: reviewStateLabel(t, review),
 								})}
 							</span>
 						</Row>
@@ -265,7 +265,7 @@ export function BranchSegment({
 
 export function ReviewSegment({ review }: { review: OpenBranchReview }) {
 	const t = useT();
-	const label = reviewChipLabel(review);
+	const label = reviewChipLabel(t, review);
 	const tone = reviewTone(review);
 	const chip = (
 		<>

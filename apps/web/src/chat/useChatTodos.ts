@@ -6,7 +6,7 @@ import type {
 	TodoPlan,
 } from "@thinkrail/contracts";
 import { TODO_NUDGE_PREFIX, WS_CHANNELS } from "@thinkrail/contracts";
-import { t as translate } from "@thinkrail/locales/react";
+import { currentTranslator, t as translate } from "@thinkrail/locales/react";
 import { useCallback, useEffect, useInsertionEffect, useRef, useState } from "react";
 import { tupleKey } from "../lib";
 import {
@@ -277,7 +277,7 @@ export function useChatTodos(workspaceId: string, sessionId: string): ChatTodos 
 
 	const openPlan = () => {
 		const state = useAppStore.getState();
-		const title = selectChatTitle(state, workspaceId, sessionId);
+		const title = selectChatTitle(currentTranslator(), state, workspaceId, sessionId);
 		void getTransport()
 			.request("todo.list", { workspaceId, sessionId, opened: "page" })
 			.catch(() => {});
@@ -378,7 +378,7 @@ export function hydrateSessionRuntime(workspaceId: string, sessionId: string): P
 			}
 			current.hydrateSession(
 				summary,
-				messagesToRuntime(messages, summary.lastSettlement),
+				messagesToRuntime(currentTranslator(), messages, summary.lastSettlement),
 				false,
 				summary.live ? undefined : syncedTick,
 				{ activate: false },

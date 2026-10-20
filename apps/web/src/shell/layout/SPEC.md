@@ -39,7 +39,9 @@ retained-workspace remap; the store installs that result atomically through
 [[submodule-web-shell-layout-state]]. Components never splice groups or tabs. Stable ids are placement keys;
 a tab's `name` remains non-identity metadata. Singleton tool names resolve from the current web-owned catalog
 at presentation time, so copy updates never rewrite local layout state. Unavailable reasons are localized copy
-resolved when the operation runs, never persisted.
+resolved when the operation runs, never persisted. Helpers evaluated during render (`layoutTabName`,
+`describeLayoutGroup`, `removeLayoutGroup`, `separatePanesReason`, `layoutPresetName`) take the caller's
+translator as their first argument, so a language change recomputes them.
 
 A click that may become a browser `dblclick` waits the shared 250 ms settle window. The upgraded gesture emits
 only its final keep while retaining the leading preview-slot claim, whether content was cached or required a

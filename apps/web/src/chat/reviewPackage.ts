@@ -1,5 +1,5 @@
 import type { ReviewFixComment } from "@thinkrail/contracts";
-import { t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 
 export interface ReviewPackageItem {
 	path: string | null;
@@ -94,7 +94,10 @@ export function reviewFixCommentsToItems(comments: ReviewFixComment[]): ReviewPa
 	}));
 }
 
-export function reviewPackageLabel(summary: Pick<ReviewPackageSummary, "count" | "files">): string {
+export function reviewPackageLabel(
+	t: Translator,
+	summary: Pick<ReviewPackageSummary, "count" | "files">,
+): string {
 	if (summary.files.length === 0)
 		return t("chat.reviewPackage.sentOnChangeSet", { count: summary.count });
 	const where =

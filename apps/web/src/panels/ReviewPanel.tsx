@@ -419,7 +419,7 @@ function CommentRow({
 							comment.anchorState === "outdated" && (
 								<span
 									className="tr-text-eyebrow text-text-subtle"
-									title={outdatedReason(comment.anchor)}
+									title={outdatedReason(t, comment.anchor)}
 								>
 									{t("review.panel.outdated")}
 								</span>
@@ -539,7 +539,8 @@ function ResolvedRow({
 }
 
 function GlanceGlyph({ glance }: { glance: ReturnType<typeof sessionGlance> }) {
-	const { Icon, className, label } = glanceIcon(glance);
+	const t = useT();
+	const { Icon, className, label } = glanceIcon(t, glance);
 	return (
 		<Icon data-glance={glance} aria-label={label} className={cn("size-16 shrink-0", className)} />
 	);

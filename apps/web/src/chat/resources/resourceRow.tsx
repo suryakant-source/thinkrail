@@ -15,7 +15,7 @@ import type {
 	DelegationRunStatus,
 	SubagentResourceSummary,
 } from "@thinkrail/contracts";
-import { t as translate, useT } from "@thinkrail/locales/react";
+import { t as translate, type Translator, useT } from "@thinkrail/locales/react";
 import { cn } from "@thinkrail/ui/utils";
 import type { KeyboardEvent, ReactNode } from "react";
 
@@ -103,44 +103,42 @@ export function sortSettled(resources: readonly Resource[]): Resource[] {
 		.sort((a, b) => (finishedAt(b) ?? startedAt(b)) - (finishedAt(a) ?? startedAt(a)));
 }
 
-export function resourceName(resource: Resource): string {
+export function resourceName(t: Translator, resource: Resource): string {
 	return resource.kind === "command"
 		? resource.summary.name
-		: (resource.summary.roleName ?? translate("resources.subagent.defaultName"));
+		: (resource.summary.roleName ?? t("resources.subagent.defaultName"));
 }
 
 export function resourceActivity(resource: Resource): string {
 	return resource.kind === "command" ? resource.summary.command : resource.summary.task;
 }
 
-export function stateLabel(state: ResourceState, kind: Resource["kind"]): string {
+export function stateLabel(t: Translator, state: ResourceState, kind: Resource["kind"]): string {
 	switch (state) {
 		case "working":
-			return kind === "command"
-				? translate("resources.state.running")
-				: translate("resources.state.working");
+			return kind === "command" ? t("resources.state.running") : t("resources.state.working");
 		case "queued":
-			return translate("resources.state.queued");
+			return t("resources.state.queued");
 		case "stopping":
-			return translate("resources.state.stopping");
+			return t("resources.state.stopping");
 		case "done":
-			return translate("common.done");
+			return t("common.done");
 		case "failed":
-			return translate("resources.state.failed");
+			return t("resources.state.failed");
 		case "stopped":
-			return translate("resources.state.stopped");
+			return t("resources.state.stopped");
 	}
 }
 
-export function formatElapsed(ms: number): string {
+export function formatElapsed(t: Translator, ms: number): string {
 	const minutes = Math.max(0, Math.floor(ms / 60_000));
-	if (minutes < 1) return translate("resources.elapsed.underMinute");
-	if (minutes < 60) return translate("resources.elapsed.minutes", { minutes });
+	if (minutes < 1) return t("resources.elapsed.underMinute");
+	if (minutes < 60) return t("resources.elapsed.minutes", { minutes });
 	const hours = Math.floor(minutes / 60);
 	const rest = minutes % 60;
 	return rest === 0
-		? translate("resources.elapsed.hours", { hours })
-		: translate("resources.elapsed.hoursMinutes", { hours, minutes: rest });
+		? t("resources.elapsed.hours", { hours })
+		: t("resources.elapsed.hoursMinutes", { hours, minutes: rest });
 }
 
 function runMs(resource: Resource, now: number): number | null {
@@ -155,9 +153,9 @@ function runMs(resource: Resource, now: number): number | null {
 	return end === undefined ? null : end - start;
 }
 
-export function elapsedLabel(resource: Resource, now: number): string | null {
+export function elapsedLabel(t: Translator, resource: Resource, now: number): string | null {
 	const ms = runMs(resource, now);
-	return ms === null ? null : formatElapsed(ms);
+	return ms === null ? null : formatElapsed(t, ms);
 }
 
 const STATE_TEXT: Record<ResourceState, string> = {
@@ -201,10 +199,11 @@ export function StateIcon({ state }: { state: ResourceState }) {
 }
 
 export function StateText({ state, kind }: { state: ResourceState; kind: Resource["kind"] }) {
+	const t = useT();
 	return (
 		<span className={cn("inline-flex items-center gap-4 whitespace-nowrap", STATE_TEXT[state])}>
 			<StateIcon state={state} />
-			{stateLabel(state, kind)}
+			{stateLabel(t, state, kind)}
 		</span>
 	);
 }
@@ -309,12 +308,12 @@ export interface ResourceRowProps {
 
 const ACCESSIBLE_ACTIVITY_LIMIT = 80;
 
-function accessibleName(name: string, activity: string, state: string): string {
+function accessibleName(t: Translator, name: string, activity: string, state: string): string {
 	const trimmed =
 		activity.length > ACCESSIBLE_ACTIVITY_LIMIT
 			? `${activity.slice(0, ACCESSIBLE_ACTIVITY_LIMIT - 1)}…`
 			: activity;
-	return translate("resources.row.accessibleName", { name, activity: trimmed, state });
+	return t("resources.row.accessibleName", { name, activity: trimmed, state });
 }
 
 export function ResourceRow({
@@ -332,10 +331,10 @@ export function ResourceRow({
 	const state = resourceState(resource);
 	const live = isLiveState(state);
 	const id = resourceId(resource);
-	const name = resourceName(resource);
+	const name = resourceName(t, resource);
 	const activity = resourceActivity(resource);
-	const label = stateLabel(state, resource.kind);
-	const elapsed = elapsedLabel(resource, now);
+	const label = stateLabel(t, state, resource.kind);
+	const elapsed = elapsedLabel(t, resource, now);
 	const exitCode = resource.kind === "command" ? resource.summary.exitCode : undefined;
 	const stopDisabled =
 		!authoritative ||
@@ -407,7 +406,7 @@ export function ResourceRow({
 				<div
 					role="option"
 					aria-selected={selected}
-					aria-label={accessibleName(name, activity, label)}
+					aria-label={accessibleName(t, name, activity, label)}
 					tabIndex={0}
 					onClick={onSelect}
 					onKeyDown={onKeyDown}

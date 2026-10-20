@@ -1,7 +1,7 @@
 import type { LocalLocalesSnapshot } from "@thinkrail/contracts";
 import { fallbackChain } from "@thinkrail/locales";
 import { applyLocale } from "@thinkrail/locales/react";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { useAppStore } from "../store";
 import { effectiveLocale, localOverlays } from "./languages";
 import { pushNativeMenuLabels } from "./nativeMenu";
@@ -26,12 +26,11 @@ export function localeSignature(tag: string, snapshot: LocalLocalesSnapshot | nu
 
 const INITIAL_SIGNATURE = localeSignature("en", null);
 
-export function useLocaleSync(): number {
+export function useLocaleSync(): void {
 	const preference = useAppStore((s) => s.locale);
 	const snapshot = useAppStore((s) => s.localLocales);
 	const systemLanguages = useSystemLanguages();
 	const applied = useRef(INITIAL_SIGNATURE);
-	const [revision, setRevision] = useState(0);
 	useEffect(() => {
 		const tag = effectiveLocale(preference, snapshot, systemLanguages.split(","));
 		const signature = localeSignature(tag, snapshot);
@@ -40,7 +39,5 @@ export function useLocaleSync(): number {
 		applyLocale(tag, localOverlays(snapshot));
 		document.documentElement.lang = tag;
 		pushNativeMenuLabels();
-		setRevision((current) => current + 1);
 	}, [preference, snapshot, systemLanguages]);
-	return revision;
 }

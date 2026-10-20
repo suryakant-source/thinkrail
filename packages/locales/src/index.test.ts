@@ -84,6 +84,20 @@ describe("validateCatalog hardening", () => {
 		expect(result).toEqual({ ok: true, strings: { "future.plain": "plain" } });
 	});
 
+	test("a quoted attribute that hides a marker is still an attributed tag", () => {
+		const result = validateCatalog({
+			"settings.language.add.steps": 'Get <0 href="https://attacker.example/<0>">en.json</0>',
+			"future.comment": "a <!-- note --> b",
+			"future.single": "<0 title='x'>y</0>",
+		});
+		expect(result).toEqual({ ok: true, strings: {} });
+	});
+
+	test("drops i18next nesting so fragments cannot be assembled into markup", () => {
+		const result = validateCatalog({ "desktop.menu.edit": "$t(future.open)", "future.open": "<0" });
+		expect(result.ok && Object.keys(result.strings)).toEqual(["future.open"]);
+	});
+
 	test("keeps markup that matches English indexed tags", () => {
 		const result = validateCatalog({
 			"settings.language.add.steps": "Lade <0>en.json</0> herunter und übersetze die Werte.",

@@ -3,6 +3,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve, sep } from "node:path";
 import ts from "typescript";
+import { renderReachViolations } from "./i18nRenderReach";
 
 export const I18N_ROOTS = ["apps/web/src", "packages/ui", "thinkrail-extensions"] as const;
 
@@ -268,6 +269,16 @@ if (import.meta.main) {
 		console.error("packages/locales/en.json:");
 		for (const problem of problems) console.error(`  ${problem}`);
 	}
-	if (violations.length > 0 || problems.length > 0) process.exitCode = 1;
-	else console.log("check-i18n: OK (no hardcoded UI text; catalog sorted and fully referenced)");
+	const stale = renderReachViolations(root, ["apps/web/tsconfig.json"]);
+	if (stale.length > 0) {
+		console.error(
+			"Render-time reads of the global translator (pass useT()'s translator; see packages/locales/SPEC.md):",
+		);
+		for (const v of stale) console.error(`  ${v.file}:${v.line}  ${v.text}`);
+	}
+	if (violations.length > 0 || problems.length > 0 || stale.length > 0) process.exitCode = 1;
+	else
+		console.log(
+			"check-i18n: OK (no hardcoded UI text; catalog sorted and fully referenced; no render-time global translator)",
+		);
 }

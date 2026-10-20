@@ -180,7 +180,7 @@ function ClosedChatRow({
 				>
 					<span className="flex-1 truncate">{chat.title}</span>
 					<span className="shrink-0 tr-text-metadata text-text-muted">
-						{relativeTime(chat.closedAt, now)}
+						{relativeTime(t, chat.closedAt, now)}
 					</span>
 					<RotateCcw className="size-14 shrink-0 text-text-muted" />
 				</button>

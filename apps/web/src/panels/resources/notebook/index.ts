@@ -1,11 +1,8 @@
-import { t } from "@thinkrail/locales/react";
 import type { ResourceRenderer } from "@/resources";
 
 export const notebookRenderer: ResourceRenderer = {
 	id: "thinkrail/notebook",
-	get label() {
-		return t("viewer.renderer.notebook");
-	},
+	labelKey: "viewer.renderer.notebook",
 	match: { glob: ["*.ipynb"], text: true },
 	rank: 130,
 	capabilities: {

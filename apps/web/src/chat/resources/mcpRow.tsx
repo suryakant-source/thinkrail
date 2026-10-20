@@ -107,7 +107,7 @@ function McpRow({
 						data-testid="resource-mcp-state"
 						className={cn("whitespace-nowrap tr-text-metadata", STATE_TEXT[tone])}
 					>
-						{mcpStatusLabel(server.state, server.toolCount)}
+						{mcpStatusLabel(t, server.state, server.toolCount)}
 					</span>
 				</span>
 				<span className="flex min-w-0 flex-wrap items-center gap-x-8 gap-y-2 text-text-muted tr-text-metadata">

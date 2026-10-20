@@ -75,12 +75,12 @@ export function ChangesScopeMenu({
 				data-testid="changes-scope-trigger"
 				data-open={open}
 				aria-label={t("changes.scopeMenu.label")}
-				title={scopeTitle(scope, commits ?? [], turns)}
+				title={scopeTitle(t, scope, commits ?? [], turns)}
 				className="flex h-panel-header-control min-w-0 items-center gap-4 rounded-sm px-4 tr-text-metadata text-text-muted outline-none transition-colors hover:bg-control-bg-hovered hover:text-text-default focus-visible:ring-2 focus-visible:ring-primary data-[open=true]:bg-control-bg-selected data-[open=true]:text-text-default"
 			>
 				<GitCompare className="size-14 shrink-0" />
 				<span data-testid="changes-scope-label" className="truncate">
-					{scopeLabel(scope, commits ?? [], turns)}
+					{scopeLabel(t, scope, commits ?? [], turns)}
 				</span>
 				<ChevronDown className="size-16 shrink-0" />
 			</DropdownMenuTrigger>
@@ -143,12 +143,12 @@ export function ChangesScopeMenu({
 											<span className="truncate">
 												{turn.id === latestTurn?.id
 													? t("changes.scope.lastTurn")
-													: t("changes.scope.turn", { time: turnTimeLabel(turn.startedAt) })}
+													: t("changes.scope.turn", { time: turnTimeLabel(t, turn.startedAt) })}
 											</span>
 											<span className="truncate tr-text-metadata text-text-muted">
 												{t("changes.scopeMenu.turnMeta", {
 													count: turn.changes.length,
-													time: relativeTime(turn.settledAt, now),
+													time: relativeTime(t, turn.settledAt, now),
 												})}
 											</span>
 										</span>
@@ -185,7 +185,7 @@ export function ChangesScopeMenu({
 									<span className="truncate tr-text-metadata text-text-muted">
 										{commit.shortSha} · {commit.author}
 										{commit.committedAt
-											? ` · ${relativeTime(Date.parse(commit.committedAt), now)}`
+											? ` · ${relativeTime(t, Date.parse(commit.committedAt), now)}`
 											: ""}
 									</span>
 								</span>

@@ -124,7 +124,7 @@ export default function ImageView({
 					<ZoomIn className="size-14" />
 				</Button>
 				<span className="ml-auto tr-text-metadata text-text-muted">
-					{dimensions} · {formatByteLength(resource.byteLength ?? content.byteLength)}
+					{dimensions} · {formatByteLength(t, resource.byteLength ?? content.byteLength)}
 				</span>
 			</div>
 			<div

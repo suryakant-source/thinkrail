@@ -1,4 +1,5 @@
 import MonacoReact, { type OnMount } from "@monaco-editor/react";
+import { useT } from "@thinkrail/locales/react";
 import type { editor } from "monaco-editor/esm/vs/editor/editor.api.js";
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import type { ResourceViewProps, SurfaceReview } from "@/resources";
@@ -38,6 +39,7 @@ export default function MonacoEditor({
 	onViewState,
 }: ResourceViewProps) {
 	use(monacoSetup);
+	const t = useT();
 	const fileLineWidth = useAppStore((state) => state.fileLineWidth);
 	const fileLineWidthBounded = useAppStore((state) => state.fileLineWidthBounded);
 	const stopThemeWatchRef = useRef<(() => void) | null>(null);
@@ -117,7 +119,7 @@ export default function MonacoEditor({
 				theme={EDITOR_THEME}
 				onMount={onMount}
 				loading={<LoadingRegion rows={12} className="h-full w-full p-12" />}
-				options={fileEditorOptions(fileLineWidth, fileLineWidthBounded, resource.path)}
+				options={fileEditorOptions(t, fileLineWidth, fileLineWidthBounded, resource.path)}
 			/>
 			<MonacoReviewZones
 				zones={reviewZones}

@@ -75,12 +75,14 @@ function placeholders(text: string): string {
 	return [...names].sort().join("\u0000");
 }
 
+const PARSED_TAG = /<!--[\s\S]*?-->|<[a-zA-Z0-9\-!/](?:"[^"]*"|'[^']*'|[^'">])*>/g;
+const BARE_MARKER = /^<\/?\d+\/?>$/;
+
 function markup(text: string): string | null {
 	const tags: string[] = [];
-	for (const match of text.matchAll(/<\/?[A-Za-z0-9][^<>]*>/g)) {
-		const tag = match[0];
-		if (!/^<\/?\d+\/?>$/.test(tag)) return null;
-		tags.push(tag);
+	for (const match of text.matchAll(PARSED_TAG)) {
+		if (!BARE_MARKER.test(match[0])) return null;
+		tags.push(match[0]);
 	}
 	return tags.sort().join("\u0000");
 }
@@ -98,7 +100,7 @@ function englishReference(key: string): string | undefined {
 }
 
 function acceptable(key: string, value: string): boolean {
-	if (value === "") return false;
+	if (value === "" || value.includes("$t(")) return false;
 	const shape = markup(value);
 	if (shape === null) return false;
 	const reference = englishReference(key);

@@ -39,13 +39,17 @@ onto separate instances.
     takes the first exact available tag, else its base language; an explicit tag is used only when
     available; otherwise `"en"`.
   - `baseLanguage(tag)` and `fallbackChain(tag)` (`[tag, base, "en"]`, deduped).
-- **`@thinkrail/locales/react`** (browser): the initialized i18next instance (`i18n`), `useT()` (typed
-  `t` for components), `t` (the same function for pure modules, store actions and toasts — called at use
-  time, never at module load), `<T>` (react-i18next `Trans` for strings carrying markup; it subscribes to
-  language changes and escapes interpolated values before markup is parsed, unescaping text nodes after, so
-  a value such as a branch named `feature/<b>x</b>` renders literally), `currentLocale()`
-  for `Intl` formatting, and `applyLocale(tag, overlays)` which removes and re-adds `bundled ∪ overlay` for
-  every chain member (so a deleted overlay's strings disappear) and switches language.
+- **`@thinkrail/locales/react`** (browser): the initialized i18next instance (`i18n`), `useT()` — the
+  `Translator` for render, a value that is **replaced whenever the language or its strings change** (a
+  `useSyncExternalStore` subscription), so anything computed from it, including React Compiler caches,
+  recomputes; `localeOf(t)` — the language a translator was issued for, for `Intl` formatting at render;
+  `currentTranslator()` / `t` / `currentLocale()` — the same, read at call time, for event-time code only
+  (handlers, effects, store actions, toasts); `<T>` (react-i18next `Trans` driven by `useT()`'s translator;
+  it escapes interpolated values before markup is parsed and unescapes text nodes after, so a value such as
+  a branch named `feature/<b>x</b>` renders literally); and `applyLocale(tag, overlays)` which removes and
+  re-adds `bundled ∪ overlay` for every chain member (so a deleted overlay's strings disappear), switches
+  language and publishes the new translator. i18next runs with `load: "currentOnly"` and the explicit
+  `fallbackChain`, so it consults exactly `tag → base → en` (never an unlisted script fallback).
 
 ## Format
 
@@ -72,9 +76,15 @@ wording fix must not orphan translations. `en.json` stays sorted.
 
 - English output is the contract tests pin: a catalog edit that changes English wording is a product
   change, reviewed like one. Plural pairs carry real English singulars (`"1 group"`, never `"1 groups"`).
-- Text resolved outside React (layout `reason`s, default tab and terminal titles, renderer labels via
-  getters, `MCP_STATE_LABEL`) reads the language current at call time; the web client remounts its UI on a
-  language change so cached render output never keeps the old language ([[submodule-web-i18n]]).
+- **Render reads the translator as a value, never the global.** The React Compiler caches each render
+  expression by its own inputs, so a helper that reads the global `t` / `currentLocale()` (or a getter
+  that does) keeps the old language after a switch. Every function evaluated at render — component and
+  hook bodies, their `useMemo` / `useState` initializers, `.map`-style callbacks, store selectors, and
+  every helper they reach — takes `useT()`'s `Translator` as a parameter (`layoutTabName(t, tab)`,
+  `relativeTime(t, ms, now)`), and catalog-labelled data carries keys (`ResourceRenderer.labelKey`,
+  `MCP_STATE_KEY`) that consumers translate. `check:i18n` enforces this with a typed reachability check.
+  Rejected: remounting the app on a language change — it discarded unsent attachments and plan input and
+  re-ran lifecycle effects such as terminal attachment, which can take a terminal from another client.
 - Persisted or wire identifiers never carry translated text: built-in layout preset names translate only
   at render, a default terminal title is recognized in the current language and in English so numbering
   survives a switch, and markers matched on save (MCP's hidden-value placeholder) stay literal.

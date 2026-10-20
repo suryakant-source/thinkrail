@@ -167,7 +167,7 @@ export const BottomGroupView = memo(function BottomGroupView({
 	const t = useT();
 	const location: LayoutGroupLocation = { area: "bottom", groupId: group.id };
 	const selected = group.tabs.find((tab) => tab.id === selectedId) ?? group.tabs[0];
-	const selectedName = selected ? layoutTabName(selected) : undefined;
+	const selectedName = selected ? layoutTabName(t, selected) : undefined;
 	return (
 		<section
 			id={groupDomId(location)}

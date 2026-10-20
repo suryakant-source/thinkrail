@@ -855,7 +855,7 @@ export default function PlanPane({
 }) {
 	const t = useT();
 	const plan = useChatTodos(workspaceId, sessionId);
-	const title = useAppStore((s) => selectChatTitle(s, workspaceId, sessionId));
+	const title = useAppStore((s) => selectChatTitle(t, s, workspaceId, sessionId));
 	const pushToast = useAppStore((s) => s.pushToast);
 	const requestToolView = useAppStore((s) => s.requestToolView);
 	const workspace = useAppStore((s) => selectWorkspaceById(s, workspaceId));

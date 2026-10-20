@@ -1,11 +1,8 @@
-import { t } from "@thinkrail/locales/react";
 import type { ResourceRenderer } from "@/resources";
 
 export const imageRenderer: ResourceRenderer = {
 	id: "thinkrail/image",
-	get label() {
-		return t("viewer.renderer.image");
-	},
+	labelKey: "viewer.renderer.image",
 	match: { mime: ["image/*"], text: false },
 	rank: 120,
 	capabilities: {

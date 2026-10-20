@@ -1,6 +1,6 @@
 import type { SpecGraphNode } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 
 export interface SpecTreeNode {
 	node: SpecGraphNode;
@@ -29,7 +29,7 @@ function isKnownSpecType(type: string): type is KnownSpecType {
 	return Object.hasOwn(SPEC_ROLES, type);
 }
 
-export function specRoleLabel(type: string): string {
+export function specRoleLabel(t: Translator, type: string): string {
 	if (isKnownSpecType(type)) return t(SPEC_ROLES[type].label);
 	const words = type.split(/[-_\s]+/).filter(Boolean);
 	if (words.length === 0) return t("panels.specTree.spec");
@@ -40,8 +40,8 @@ export function specDisplayTitle(title: string): string {
 	return title.replace(/\s+[—–]\s+/g, " · ");
 }
 
-export function specRoleTag(type: string): string {
-	return isKnownSpecType(type) ? t(SPEC_ROLES[type].tag) : specRoleLabel(type).toUpperCase();
+export function specRoleTag(t: Translator, type: string): string {
+	return isKnownSpecType(type) ? t(SPEC_ROLES[type].tag) : specRoleLabel(t, type).toUpperCase();
 }
 
 export function buildSpecTree(nodes: SpecGraphNode[]): SpecTreeNode[] {

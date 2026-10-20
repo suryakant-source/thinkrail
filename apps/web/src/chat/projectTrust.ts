@@ -5,7 +5,7 @@ import type {
 	WsParams,
 } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 
 export type ProjectTrustNotice =
 	| { kind: "hidden" }
@@ -58,6 +58,7 @@ const CODE_KINDS: ReadonlyArray<[ProjectResourceKind, MessageKey]> = [
 ];
 
 function namesOf(
+	t: Translator,
 	kinds: ReadonlyArray<[ProjectResourceKind, MessageKey]>,
 	present: ReadonlySet<ProjectResourceKind>,
 ): string {
@@ -72,6 +73,7 @@ function namesOf(
 }
 
 export function untrustedNoticeText(
+	t: Translator,
 	notice: Extract<ProjectTrustNotice, { kind: "untrusted" }>,
 ): string {
 	const parts = [
@@ -87,11 +89,12 @@ export function untrustedNoticeText(
 }
 
 export function trustEnablesText(
+	t: Translator,
 	notice: Extract<ProjectTrustNotice, { kind: "untrusted" }>,
 ): string | null {
 	const present = new Set(notice.piResources);
-	const loads = namesOf(LOADED_KINDS, present);
-	const runs = namesOf(CODE_KINDS, present);
+	const loads = namesOf(t, LOADED_KINDS, present);
+	const runs = namesOf(t, CODE_KINDS, present);
 	const enables = !runs
 		? loads
 			? t("chat.trust.enablesLoads", { loads })
@@ -116,6 +119,7 @@ export function trustGrantParams(
 }
 
 export function trustedNoticeText(
+	t: Translator,
 	notice: Extract<ProjectTrustNotice, { kind: "trusted" }>,
 ): string {
 	return notice.aliasSkills > 0
@@ -128,6 +132,7 @@ export function canStopTrusting(project: TrustRecord | undefined): boolean {
 }
 
 export function stopTrustingText(
+	t: Translator,
 	project: TrustRecord | undefined,
 	supportsProjectTrust: boolean,
 ): string {

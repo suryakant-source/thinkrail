@@ -1,11 +1,8 @@
-import { t } from "@thinkrail/locales/react";
 import type { ResourceRenderer } from "@/resources";
 
 export const svgRenderer: ResourceRenderer = {
 	id: "thinkrail/svg",
-	get label() {
-		return t("viewer.renderer.vector");
-	},
+	labelKey: "viewer.renderer.vector",
 	match: { mime: ["image/svg+xml"], text: true },
 	rank: 130,
 	capabilities: {

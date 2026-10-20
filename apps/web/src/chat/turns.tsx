@@ -279,6 +279,7 @@ function UserTurn({
 	attachmentNames?: string[] | undefined;
 	agentResponded: boolean;
 }) {
+	const t = useT();
 	const text = userText(message.content);
 	const attachments = userAttachments(message.content, attachmentNames);
 	const skill = parseSkillInvocation(text);
@@ -319,7 +320,7 @@ function UserTurn({
 					) : null}
 					<div data-testid="review-package-card" className="whitespace-normal">
 						<span data-testid="review-package-summary" className="block text-text-default">
-							{reviewPackageLabel(review)}
+							{reviewPackageLabel(t, review)}
 						</span>
 						<ReviewPackageComments foldPrefix={id} items={review.items} />
 					</div>

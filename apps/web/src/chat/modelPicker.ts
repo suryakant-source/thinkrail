@@ -1,6 +1,6 @@
 import type { ProviderAuthKind, ThinkingLevel, WireModel } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 
 export function formatContext(tokens: number): string {
 	if (tokens >= 1_000_000) return `${Math.round(tokens / 100_000) / 10}M`.replace(".0", "");
@@ -38,7 +38,7 @@ export function costLabel(model: WireModel): string | null {
 }
 
 /** The short word that sits beside the connection glyph in a row: what this model draws on. */
-export function kindLabel(model: WireModel): string | null {
+export function kindLabel(t: Translator, model: WireModel): string | null {
 	const auth = model.auth;
 	if (!auth) return null;
 	switch (auth.kind) {
@@ -56,7 +56,7 @@ export function kindLabel(model: WireModel): string | null {
 }
 
 /** The full sentence for tooltips and group headings: kind word plus pi's detail. */
-export function describeAuth(model: WireModel): string | null {
+export function describeAuth(t: Translator, model: WireModel): string | null {
 	if (!model.auth) return null;
 	const label = t(AUTH_KIND_LABEL[model.auth.kind]);
 	return model.auth.detail ? `${label} · ${model.auth.detail}` : label;
@@ -107,7 +107,7 @@ export interface ProviderGroup {
 	auth: string | null;
 }
 
-export function groupByProvider(models: readonly WireModel[]): ProviderGroup[] {
+export function groupByProvider(t: Translator, models: readonly WireModel[]): ProviderGroup[] {
 	const groups = new Map<string, WireModel[]>();
 	for (const model of models) {
 		const list = groups.get(model.provider);
@@ -117,7 +117,7 @@ export function groupByProvider(models: readonly WireModel[]): ProviderGroup[] {
 	return [...groups].map(([provider, list]) => ({
 		provider,
 		models: list,
-		auth: list.map(describeAuth).find((auth) => auth !== null) ?? null,
+		auth: list.map((model) => describeAuth(t, model)).find((auth) => auth !== null) ?? null,
 	}));
 }
 

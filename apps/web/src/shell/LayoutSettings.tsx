@@ -175,7 +175,7 @@ export function LayoutSettings() {
 		if (!activeWorkspaceId || !frame) return;
 		try {
 			applyLayoutPresetLocally(preset);
-			toast.success(t("workbench.layoutSettings.applied", { name: layoutPresetName(preset) }));
+			toast.success(t("workbench.layoutSettings.applied", { name: layoutPresetName(t, preset) }));
 		} catch (error) {
 			toast.error(errorText(error), t("workbench.layoutSettings.applyFailed"));
 		}
@@ -205,7 +205,7 @@ export function LayoutSettings() {
 						!BUILTIN_PRESET_IDS.has(preset.id) &&
 						customLayoutPresets.some((candidate) => candidate.id === preset.id);
 					const Icon = PRESET_ICONS[preset.id] ?? RiLayoutLine;
-					const presetName = layoutPresetName(preset);
+					const presetName = layoutPresetName(t, preset);
 					const description = PRESET_DESCRIPTIONS[preset.id];
 
 					return (
@@ -456,7 +456,7 @@ export function LayoutSettings() {
 				className="mt-24"
 				label={t("workbench.layoutSettings.resetToDefault")}
 				description={t("workbench.layoutSettings.resetDescription", {
-					name: layoutPresetName(selected),
+					name: layoutPresetName(t, selected),
 				})}
 				control={
 					<Button

@@ -817,7 +817,7 @@ function WorkspaceRow({
 		<span
 			data-testid="workspace-settled-reason"
 			data-reason={settled.kind}
-			title={settledReasonTitle(settled, now)}
+			title={settledReasonTitle(t, settled, now)}
 			className={cn(
 				"shrink-0 rounded-full border px-4 tr-text-caption",
 				settled.kind === "review" && settled.state === "merged"
@@ -827,7 +827,7 @@ function WorkspaceRow({
 						: "border-border-default text-text-subtle",
 			)}
 		>
-			{settledReasonLabel(settled, now)}
+			{settledReasonLabel(t, settled, now)}
 		</span>
 	) : null;
 	const hoverAction = isSettled ? (

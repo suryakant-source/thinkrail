@@ -16,7 +16,7 @@ import {
 } from "@remixicon/react";
 import type { TodoGroupItem, TodoItem, TodoPlan, TodoStatus } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { t as translate, useT } from "@thinkrail/locales/react";
+import { type Translator, useT } from "@thinkrail/locales/react";
 import { IconTooltip } from "@thinkrail/ui/tooltip";
 import { cn } from "@thinkrail/ui/utils";
 import { useState } from "react";
@@ -39,7 +39,10 @@ const STATUS_LABEL = {
 	done: "common.done",
 } satisfies Record<TodoStatus, MessageKey>;
 
-export function glanceIcon(glance: PlanGlance): {
+export function glanceIcon(
+	t: Translator,
+	glance: PlanGlance,
+): {
 	Icon: typeof CircleDot;
 	label: string;
 	className: string;
@@ -47,20 +50,20 @@ export function glanceIcon(glance: PlanGlance): {
 	if (glance === "waiting_question")
 		return {
 			Icon: MessageCircleQuestion,
-			label: translate("chat.todo.glance.question"),
+			label: t("chat.todo.glance.question"),
 			className: "text-primary",
 		};
 	if (glance === "waiting")
 		return {
 			Icon: CirclePause,
-			label: translate("chat.todo.glance.paused"),
+			label: t("chat.todo.glance.paused"),
 			className: "text-text-muted",
 		};
-	return { Icon: CircleDot, label: translate(STATUS_LABEL.in_progress), className: "text-primary" };
+	return { Icon: CircleDot, label: t(STATUS_LABEL.in_progress), className: "text-primary" };
 }
 
-function statusLabel(status: TodoStatus, glance: PlanGlance): string {
-	return status === "in_progress" ? glanceIcon(glance).label : translate(STATUS_LABEL[status]);
+function statusLabel(t: Translator, status: TodoStatus, glance: PlanGlance): string {
+	return status === "in_progress" ? glanceIcon(t, glance).label : t(STATUS_LABEL[status]);
 }
 
 export function StatusIcon({
@@ -76,12 +79,13 @@ export function StatusIcon({
 	reviewing?: boolean;
 	changesRequested?: boolean;
 }) {
+	const t = useT();
 	if (reviewing)
 		return (
 			<LoaderCircle data-reviewing="true" className="size-12 shrink-0 animate-spin text-primary" />
 		);
 	if (status === "in_progress") {
-		const { Icon, className } = glanceIcon(glance);
+		const { Icon, className } = glanceIcon(t, glance);
 		return <Icon data-glance={glance} className={cn("size-12 shrink-0", className)} />;
 	}
 	if (status === "done" && changesRequested)
@@ -400,7 +404,7 @@ function TodoRow({
 							? t("chat.todo.review.needsFix")
 							: reviewed
 								? t("chat.todo.review.checked")
-								: statusLabel(todo.status, glance)
+								: statusLabel(t, todo.status, glance)
 				}
 			>
 				<StatusIcon

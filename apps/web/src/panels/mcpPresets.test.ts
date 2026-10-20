@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { t } from "@thinkrail/locales/react";
+import { currentTranslator, t } from "@thinkrail/locales/react";
 import {
 	importIssues,
 	mcpEntryErrors,
@@ -20,9 +20,9 @@ test("presets are valid, pinned, credential-free entries with unique names", () 
 	]);
 	expect(new Set(MCP_PRESETS.map((preset) => preset.name)).size).toBe(MCP_PRESETS.length);
 	for (const preset of MCP_PRESETS) {
-		expect(mcpEntryErrors(preset.entry)).toEqual([]);
-		expect(mcpNameIssue(preset.name, preset.scope, [])).toBeUndefined();
-		expect(mcpSecretIssues(preset.entry)).toEqual([]);
+		expect(mcpEntryErrors(currentTranslator(), preset.entry)).toEqual([]);
+		expect(mcpNameIssue(currentTranslator(), preset.name, preset.scope, [])).toBeUndefined();
+		expect(mcpSecretIssues(currentTranslator(), preset.entry)).toEqual([]);
 		const { url, args } = preset.entry as { url?: string; args?: string[] };
 		if (url) expect(url.startsWith("https://")).toBe(true);
 		for (const arg of args ?? []) expect(arg).not.toMatch(/@latest$/);
@@ -45,7 +45,7 @@ test("write-capable presets name what they can change, and the stdio preset is o
 
 test("GitHub is a pasteable read-only recipe, not a preset, whose bearer header comes from gh auth token", () => {
 	expect(MCP_PRESETS.some((preset) => preset.name === "github")).toBe(false);
-	const parsed = parseMcpServersJson(GITHUB_MCP_RECIPE_JSON);
+	const parsed = parseMcpServersJson(currentTranslator(), GITHUB_MCP_RECIPE_JSON);
 	if (!parsed.ok) throw new Error(parsed.error);
 	const [server] = parsed.servers;
 	if (!server) throw new Error("the recipe names no server");
@@ -55,7 +55,7 @@ test("GitHub is a pasteable read-only recipe, not a preset, whose bearer header 
 		url: "https://api.githubcopilot.com/mcp/readonly",
 		headers: { Authorization: '!t=$(gh auth token) && echo "Bearer $t"' },
 	});
-	expect(importIssues(server, "user", [], ["github"])).toEqual([]);
+	expect(importIssues(currentTranslator(), server, "user", [], ["github"])).toEqual([]);
 	expect(reviewMcpServer(server.name, server.entry).runs).toEqual([
 		{ label: "header Authorization", text: 't=$(gh auth token) && echo "Bearer $t"' },
 	]);

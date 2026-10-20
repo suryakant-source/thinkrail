@@ -1,13 +1,13 @@
 import { RiCoinsLine as Coins, RiLoader4Line as Loader } from "@remixicon/react";
 import type { JbcentralQuotaSnapshot } from "@thinkrail/contracts";
-import { currentLocale, useT } from "@thinkrail/locales/react";
+import { localeOf, type Translator, useT } from "@thinkrail/locales/react";
 import { IconTooltip } from "@thinkrail/ui/tooltip";
 import { formatJbcentralQuota } from "./jbcentralQuota";
 
 export type JbcentralQuotaViewSnapshot = JbcentralQuotaSnapshot | { state: "loading" };
 
-function observedLabel(observedAt: number): string {
-	return new Date(observedAt).toLocaleTimeString(currentLocale(), {
+function observedLabel(t: Translator, observedAt: number): string {
+	return new Date(observedAt).toLocaleTimeString(localeOf(t), {
 		hour: "numeric",
 		minute: "2-digit",
 		second: "2-digit",
@@ -71,7 +71,7 @@ export function JbcentralQuotaIndicator({
 			) : null}
 		</>
 	);
-	const observed = observedLabel(snapshot.observedAt);
+	const observed = observedLabel(t, snapshot.observedAt);
 	const label = stale
 		? t("shell.jbcentralQuota.staleLabel", { value })
 		: t("shell.jbcentralQuota.availableLabel", { value, time: observed });

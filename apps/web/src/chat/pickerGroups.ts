@@ -1,5 +1,6 @@
 import { sameModel, type WireModel } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
+import type { Translator } from "@thinkrail/locales/react";
 import type { ModelRef } from "@/store";
 import { groupByProvider, modelKey, type ProviderGroup } from "./modelPicker";
 
@@ -144,6 +145,7 @@ function matches(row: SearchRow, query: string): boolean {
 }
 
 export function pickerGroups(
+	t: Translator,
 	models: readonly WireModel[],
 	options: {
 		pinned: readonly ModelRef[];
@@ -155,7 +157,7 @@ export function pickerGroups(
 	const { pinned, query, expansion, row } = options;
 	const searching = query !== "";
 	const unpinned = models.filter((model) => !pinned.some((p) => sameModel(p, model)));
-	return groupByProvider(unpinned).flatMap((group) => {
+	return groupByProvider(t, unpinned).flatMap((group) => {
 		const count = searching
 			? group.models.filter((model) => matches(row(model), query)).length
 			: group.models.length;

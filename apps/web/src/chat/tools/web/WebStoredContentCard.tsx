@@ -1,6 +1,6 @@
 import { RiLinksLine as LinkIcon } from "@remixicon/react";
 import { numArg, resultText, strArg, type ToolRenderProps } from "@thinkrail/extension-api/web";
-import { t as translate, useT } from "@thinkrail/locales/react";
+import { currentTranslator, type Translator, useT } from "@thinkrail/locales/react";
 import { WebResultBody } from "./WebResultBody";
 
 function detailString(result: unknown, key: string): string {
@@ -11,26 +11,30 @@ function detailString(result: unknown, key: string): string {
 	return typeof value === "string" ? value : "";
 }
 
-export function storedContentTarget(args: Record<string, unknown>, result: unknown): string {
+export function storedContentTarget(
+	t: Translator,
+	args: Record<string, unknown>,
+	result: unknown,
+): string {
 	const query = strArg(args, "query") || detailString(result, "query");
 	if (query) return query;
 	const url = strArg(args, "url") || detailString(result, "url");
 	if (url) return url;
 	const queryIndex = numArg(args, "queryIndex");
-	if (queryIndex !== null) return translate("tools.webStored.queryIndex", { index: queryIndex });
+	if (queryIndex !== null) return t("tools.webStored.queryIndex", { index: queryIndex });
 	const urlIndex = numArg(args, "urlIndex");
-	if (urlIndex !== null) return translate("tools.webStored.urlIndex", { index: urlIndex });
+	if (urlIndex !== null) return t("tools.webStored.urlIndex", { index: urlIndex });
 	return "";
 }
 
 export function storedContentSummary({ args, result }: ToolRenderProps): string {
-	return storedContentTarget(args, result) || strArg(args, "responseId");
+	return storedContentTarget(currentTranslator(), args, result) || strArg(args, "responseId");
 }
 
 export function WebStoredContentCard({ toolCallId, args, result, status }: ToolRenderProps) {
 	const t = useT();
 	const responseId = strArg(args, "responseId");
-	const target = storedContentTarget(args, result);
+	const target = storedContentTarget(t, args, result);
 	const output = resultText(result);
 	return (
 		<div data-testid="tool-get_search_content" className="flex flex-col gap-4">

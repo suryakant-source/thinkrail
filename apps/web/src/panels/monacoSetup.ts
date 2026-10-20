@@ -1,6 +1,6 @@
 import { loader } from "@monaco-editor/react";
 import { shikiToMonaco, textmateThemeToMonacoTheme } from "@shikijs/monaco";
-import { t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 import { createHighlighterCore, type HighlighterCore, type ThemeRegistration } from "shiki/core";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import "monaco-editor/esm/vs/base/browser/ui/codicons/codicon/codicon.css";
@@ -87,7 +87,12 @@ function cssVar(name: string): string | undefined {
 	return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || undefined;
 }
 
-export function fileEditorOptions(lineWidth: number, bounded: boolean, path: string) {
+export function fileEditorOptions(
+	t: Translator,
+	lineWidth: number,
+	bounded: boolean,
+	path: string,
+) {
 	const fontSize = Number.parseFloat(cssVar("--tr-font-size-s11") ?? "") || 11;
 	const lineHeight = Number.parseFloat(cssVar("--tr-line-height-default") ?? "") || undefined;
 	const paddingTop = Number.parseFloat(cssVar("--space-8") ?? "");

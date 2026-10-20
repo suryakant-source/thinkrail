@@ -1,15 +1,15 @@
-import { currentLocale, t as translate, useT } from "@thinkrail/locales/react";
+import { localeOf, type Translator, useT } from "@thinkrail/locales/react";
 import type { ResourceContent, ResourceDiffProps } from "@/resources";
 
-function sideSize(content: ResourceContent): string {
-	if (content.kind === "absent") return translate("viewer.binary.absent");
+function sideSize(t: Translator, content: ResourceContent): string {
+	if (content.kind === "absent") return t("viewer.binary.absent");
 	const bytes =
 		content.kind === "bytes"
 			? content.byteLength
 			: new TextEncoder().encode(content.text).byteLength;
-	return translate("viewer.binary.bytes", {
+	return t("viewer.binary.bytes", {
 		count: bytes,
-		size: bytes.toLocaleString(currentLocale()),
+		size: bytes.toLocaleString(localeOf(t)),
 	});
 }
 
@@ -23,8 +23,8 @@ export default function BinaryDiff({ original, modified }: ResourceDiffProps) {
 			>
 				<h2 className="tr-title-entity text-text-default">{t("viewer.binary.differ")}</h2>
 				<div className="mt-12 flex items-center justify-center gap-24 tr-text-metadata text-text-muted">
-					<span>{t("viewer.binary.original", { size: sideSize(original) })}</span>
-					<span>{t("viewer.binary.modified", { size: sideSize(modified) })}</span>
+					<span>{t("viewer.binary.original", { size: sideSize(t, original) })}</span>
+					<span>{t("viewer.binary.modified", { size: sideSize(t, modified) })}</span>
 				</div>
 			</section>
 		</div>

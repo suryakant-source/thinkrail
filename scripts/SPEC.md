@@ -47,4 +47,9 @@ symbols, so `⌘K`, `·`, and counts pass; the bare brand `ThinkRail` is the one
 heuristic floor, not a proof: review still owns strings returned from plain functions. It also checks
 `packages/locales/en.json`: keys sorted, values non-empty, and every key (plural base for `_one`/`_other`)
 referenced as a string literal by some UI, desktop, or locales source, so removed UI leaves no orphaned
-translations. There is no suppression mechanism; a false positive is fixed in the checker with a test.
+translations. Finally it builds the web TypeScript program and fails on any **render-time read of the global
+translator** ([[module-locales]] § Render reads the translator as a value): a reference to `t`, `i18n` or
+`currentLocale` from `@thinkrail/locales/react` evaluated in a component or hook body (including
+`useMemo`/`useState` initializers, `useAppStore` selectors and `.map`-style callbacks), a call — or a
+by-reference pass to such a callback — of any function that reaches them synchronously (transitively), and
+any getter that reads them. Event handlers, effects and other deferred callbacks are event-time and pass. There is no suppression mechanism; a false positive is fixed in the checker with a test.

@@ -1,5 +1,5 @@
 import type { UserMessage } from "@thinkrail/contracts";
-import { t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 
 export const DOUBLE_CLICK_SETTLE_MS = 250;
 
@@ -267,7 +267,7 @@ export function platformShortcutLabel(
 	return alt ? `Ctrl+Alt+${key}` : `Ctrl+${key}`;
 }
 
-export function relativeTime(ms: number, now: number): string {
+export function relativeTime(t: Translator, ms: number, now: number): string {
 	const s = Math.floor((now - ms) / 1000);
 	if (s < 60) return t("lib.relativeTime.justNow");
 	const m = Math.floor(s / 60);
@@ -278,7 +278,7 @@ export function relativeTime(ms: number, now: number): string {
 }
 
 /** Compact elapsed label for dense rows: `3h`, `12d`, `3w`, `4mo`. */
-export function compactAge(ms: number, now: number): string {
+export function compactAge(t: Translator, ms: number, now: number): string {
 	const hours = Math.max(0, Math.floor((now - ms) / 3_600_000));
 	if (hours < 1) return t("lib.compactAge.underHour");
 	if (hours < 24) return t("lib.compactAge.hours", { count: hours });

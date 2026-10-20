@@ -270,7 +270,7 @@ export const ChangesFileSection = memo(function ChangesFileSection({
 								<ToggleSegment
 									key={candidate.id}
 									testid={rendererTestId(candidate.id)}
-									label={candidate.label}
+									label={t(candidate.labelKey)}
 									active={candidate.id === renderer.id}
 									onClick={() => selectRenderer(candidate.id)}
 								/>

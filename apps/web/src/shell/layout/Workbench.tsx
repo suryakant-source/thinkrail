@@ -8,7 +8,7 @@ import {
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
-import { t } from "@thinkrail/locales/react";
+import { useT } from "@thinkrail/locales/react";
 import {
 	type ImperativePanelGroupHandle,
 	ResizableHandle,
@@ -109,6 +109,7 @@ export function Workbench({
 	onNewTerminal,
 	onGestureCanceled,
 }: WorkbenchProps) {
+	const t = useT();
 	const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 	const [draggingTab, setDraggingTab] = useState<LayoutTab | null>(null);
 	const tabSelectionEpoch = useRef(0);
@@ -1039,7 +1040,7 @@ export function Workbench({
 				{draggingTab ? (
 					<div className="flex max-w-224 items-center gap-4 rounded-sm border border-primary bg-container-elevated-bg px-8 py-4 tr-text-ui text-text-default shadow-lg">
 						{tabIcon(draggingTab)}
-						<span className="truncate">{layoutTabName(draggingTab)}</span>
+						<span className="truncate">{layoutTabName(t, draggingTab)}</span>
 					</div>
 				) : null}
 			</DragOverlay>

@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import type { OpenBranchReview, Project, Workspace } from "@thinkrail/contracts";
+import { currentTranslator } from "@thinkrail/locales/react";
 import { TooltipProvider } from "@thinkrail/ui/tooltip";
 import { renderToStaticMarkup } from "react-dom/server";
 import { LocationBar } from "./LocationBar";
@@ -192,9 +193,11 @@ test("a merged review turns the Pull request chip info and drops the Remote segm
 	expect(html).toMatch(/data-testid="scope-review"[^>]*data-state-tone="info"/);
 	expect(testids(html)).not.toContain("scope-remote-segment");
 	expect(reviewTone({ ...review, state: "closed" })).toBe("neutral");
-	expect(reviewChipLabel({ ...review, state: "closed" })).toBe("Closed #648");
-	expect(reviewChipLabel({ kind: "merge-request", number: 7, state: "merged" })).toBe("Merged !7");
-	expect(reviewChipLabel({ kind: "merge-request", number: 7 })).toBe("MR !7");
+	expect(reviewChipLabel(currentTranslator(), { ...review, state: "closed" })).toBe("Closed #648");
+	expect(
+		reviewChipLabel(currentTranslator(), { kind: "merge-request", number: 7, state: "merged" }),
+	).toBe("Merged !7");
+	expect(reviewChipLabel(currentTranslator(), { kind: "merge-request", number: 7 })).toBe("MR !7");
 	expect(remoteCounts(merged)).toBeNull();
 });
 

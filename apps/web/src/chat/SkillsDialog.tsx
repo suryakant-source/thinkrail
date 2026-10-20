@@ -6,7 +6,7 @@ import {
 } from "@remixicon/react";
 import type { Project, SkillCatalogEntry, Workspace } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { T, t as translate, useT } from "@thinkrail/locales/react";
+import { T, type Translator, t as translate, useT } from "@thinkrail/locales/react";
 import { Button } from "@thinkrail/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@thinkrail/ui/dialog";
 import { Switch } from "@thinkrail/ui/switch";
@@ -41,7 +41,7 @@ interface Group {
 	items: SkillCatalogEntry[];
 }
 
-function groupCatalog(entries: SkillCatalogEntry[]): Group[] {
+function groupCatalog(t: Translator, entries: SkillCatalogEntry[]): Group[] {
 	const byKey = new Map<string, { isPlugin: boolean; items: SkillCatalogEntry[] }>();
 	for (const entry of entries) {
 		const group = byKey.get(entry.group) ?? { isPlugin: Boolean(entry.plugin), items: [] };
@@ -53,12 +53,8 @@ function groupCatalog(entries: SkillCatalogEntry[]): Group[] {
 			const meta = TIER_META[key];
 			return {
 				key,
-				label: meta?.label ? translate(meta.label) : (TIER_BRAND[key] ?? key),
-				hint: group.isPlugin
-					? translate("chat.skills.pluginHint")
-					: meta
-						? translate(meta.hint)
-						: "",
+				label: meta?.label ? t(meta.label) : (TIER_BRAND[key] ?? key),
+				hint: group.isPlugin ? t("chat.skills.pluginHint") : meta ? t(meta.hint) : "",
 				isPlugin: group.isPlugin,
 				items: group.items,
 				rank: group.isPlugin ? 3 : (meta?.rank ?? 5),
@@ -176,8 +172,8 @@ export function SkillsDialog({
 			aliasSkills: [...new Set([...trustSummary.aliasSkills, ...catalogAliases])],
 		},
 	);
-	const trustEnables = trustNotice.kind === "untrusted" ? trustEnablesText(trustNotice) : null;
-	const groups = groupCatalog(entries ?? []);
+	const trustEnables = trustNotice.kind === "untrusted" ? trustEnablesText(t, trustNotice) : null;
+	const groups = groupCatalog(t, entries ?? []);
 	const hasPlugins = groups.some((g) => g.isPlugin);
 	const isLeadingKey = (key: string) => key === "bundled" || key === "pi";
 	const leadingGroups = groups.filter((g) => isLeadingKey(g.key));
@@ -293,7 +289,7 @@ export function SkillsDialog({
 							<TriangleAlert className="mt-2 size-14 shrink-0 text-feedback-warning" aria-hidden />
 							<span className="flex min-w-0 flex-1 flex-col gap-2">
 								<span className="tr-text-ui text-text-default">
-									{untrustedNoticeText(trustNotice)}
+									{untrustedNoticeText(t, trustNotice)}
 								</span>
 								{trustEnables ? (
 									<span className="text-text-muted tr-text-metadata">{trustEnables}</span>

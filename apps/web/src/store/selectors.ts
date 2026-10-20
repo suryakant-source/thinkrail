@@ -23,7 +23,7 @@ import {
 	WORKSPACE_SETTLE_PROTOCOL_VERSION,
 	type Workspace,
 } from "@thinkrail/contracts";
-import { t } from "@thinkrail/locales/react";
+import { type Translator, t } from "@thinkrail/locales/react";
 import type { LoginState } from "../auth";
 import {
 	compactAge,
@@ -288,29 +288,29 @@ export type SettledReason =
 	| { kind: "idle"; since: number };
 
 /** Chip text; `settledReasonTitle` is the long form. */
-export function settledReasonLabel(reason: SettledReason, now: number): string {
+export function settledReasonLabel(t: Translator, reason: SettledReason, now: number): string {
 	switch (reason.kind) {
 		case "override":
 			return t("store.settled.byYou");
 		case "review":
 			return reason.state === "merged" ? t("store.settled.merged") : t("store.settled.closed");
 		case "idle":
-			return t("store.settled.idle", { age: compactAge(reason.since, now) });
+			return t("store.settled.idle", { age: compactAge(t, reason.since, now) });
 	}
 }
 
-export function settledReasonTitle(reason: SettledReason, now: number): string {
+export function settledReasonTitle(t: Translator, reason: SettledReason, now: number): string {
 	switch (reason.kind) {
 		case "override":
 			return reason.since === undefined
 				? t("store.settled.byYouTitle")
-				: t("store.settled.byYouTitleAt", { time: relativeTime(reason.since, now) });
+				: t("store.settled.byYouTitleAt", { time: relativeTime(t, reason.since, now) });
 		case "review":
 			return reason.state === "merged"
 				? t("store.settled.prMergedTitle")
 				: t("store.settled.prClosedTitle");
 		case "idle":
-			return t("store.settled.idleTitle", { age: compactAge(reason.since, now) });
+			return t("store.settled.idleTitle", { age: compactAge(t, reason.since, now) });
 	}
 }
 
@@ -862,6 +862,7 @@ export function specPathMatcher(nodes: SpecGraphNode[]): (path: string) => boole
 }
 
 export function selectChatTitle(
+	t: Translator,
 	state: { tabsByWorkspace: Record<string, EditorTab[]> },
 	workspaceId: string,
 	sessionId: string,

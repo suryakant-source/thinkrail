@@ -1,7 +1,7 @@
 import type { DelegationRunDetails, DelegationRunStatus } from "@thinkrail/contracts";
 import { isDelegationRunDetails } from "@thinkrail/contracts";
 import { strArg, type ToolRenderProps } from "@thinkrail/extension-api/web";
-import { t } from "@thinkrail/locales/react";
+import { currentTranslator, type Translator } from "@thinkrail/locales/react";
 import { formatCost, formatElapsed, formatTokens } from "../../SessionStatsBar";
 
 export function readRunDetails(value: unknown): DelegationRunDetails | undefined {
@@ -15,6 +15,7 @@ export function isTerminalRunStatus(status: DelegationRunStatus): boolean {
 }
 
 export function usageCounters(
+	t: Translator,
 	details: DelegationRunDetails,
 	tokens: "total" | "split" = "total",
 ): string[] {
@@ -36,10 +37,11 @@ export function usageCounters(
 }
 
 export function runCounters(
+	t: Translator,
 	details: DelegationRunDetails,
 	tokens: "total" | "split" = "total",
 ): string[] {
-	const parts = usageCounters(details, tokens);
+	const parts = usageCounters(t, details, tokens);
 	if (details.durationMs > 0) parts.push(formatElapsed(details.durationMs));
 	return parts;
 }
@@ -63,6 +65,7 @@ export function reportTeaser(report: string): string {
 }
 
 export function agentSummary({ args, result }: ToolRenderProps): string {
+	const t = currentTranslator();
 	const details = readRunDetails(result);
 	if (!details) {
 		const role = strArg(args, "subagent_type") || strArg(args, "session_id");
@@ -75,7 +78,7 @@ export function agentSummary({ args, result }: ToolRenderProps): string {
 	if (args.run_in_background === true && !isTerminalRunStatus(details.status)) {
 		parts.push(t("tools.agent.summaryBackground"));
 	}
-	parts.push(...runCounters(details));
+	parts.push(...runCounters(t, details));
 	if (details.status === "running" && details.activity) parts.push(details.activity);
 	return parts.join(" · ");
 }

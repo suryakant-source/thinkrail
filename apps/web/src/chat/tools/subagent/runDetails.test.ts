@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import type { DelegationRunDetails } from "@thinkrail/contracts";
 import type { ToolRenderProps } from "@thinkrail/extension-api/web";
+import { currentTranslator } from "@thinkrail/locales/react";
 import {
 	agentSummary,
 	completionReport,
@@ -66,8 +67,13 @@ test("readRunDetails narrows a result's details and rejects malformed shapes", (
 });
 
 test("runCounters formats turns/tokens/cost/duration, skipping zeros", () => {
-	expect(runCounters(details())).toEqual(["12 turns", "30k tok", "$0.040", "45s"]);
-	expect(runCounters(details(), "split")).toEqual([
+	expect(runCounters(currentTranslator(), details())).toEqual([
+		"12 turns",
+		"30k tok",
+		"$0.040",
+		"45s",
+	]);
+	expect(runCounters(currentTranslator(), details(), "split")).toEqual([
 		"12 turns",
 		"in 25k / out 5.3k",
 		"$0.040",
@@ -85,7 +91,7 @@ test("runCounters formats turns/tokens/cost/duration, skipping zeros", () => {
 		},
 		durationMs: 0,
 	});
-	expect(runCounters(fresh)).toEqual([]);
+	expect(runCounters(currentTranslator(), fresh)).toEqual([]);
 });
 
 test("agentSummary is the live collapsed-header line, per status", () => {

@@ -48,10 +48,11 @@ export const AuxiliaryRailToolButton = forwardRef<
 		onActivate: () => void;
 	}
 >(function AuxiliaryRailToolButton({ entry, controls, control, onActivate }, ref) {
+	const t = useT();
 	const { region } = entry;
 	const active = entry.selected && entry.expanded;
 	const tab = toolTab(entry.tool);
-	const name = layoutTabName(tab);
+	const name = layoutTabName(t, tab);
 	return (
 		<div data-active={active} className={railEntryFrameClass(region)}>
 			{active ? <AuxiliaryRailIndicator region={region} /> : null}

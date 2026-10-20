@@ -76,7 +76,7 @@ export function UnplacedReviewStrip({
 			className="max-h-[40vh] shrink-0 overflow-auto border-border-default border-b bg-container-header-bg p-8"
 		>
 			<p className="px-4 tr-text-eyebrow text-text-muted">
-				{t("panels.unplacedReview.title", { renderer: renderer.label })}
+				{t("panels.unplacedReview.title", { renderer: t(renderer.labelKey) })}
 			</p>
 			{entries.map(({ review, thread }) => {
 				const target = candidates.find(
@@ -96,7 +96,7 @@ export function UnplacedReviewStrip({
 								className="ml-12 rounded-sm px-8 py-4 tr-text-action text-primary hover:bg-control-bg-hovered"
 								onClick={() => onSelectRenderer(target.id)}
 							>
-								{t("panels.unplacedReview.showIn", { renderer: target.label })}
+								{t("panels.unplacedReview.showIn", { renderer: t(target.labelKey) })}
 							</button>
 						) : null}
 					</div>

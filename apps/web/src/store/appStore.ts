@@ -56,7 +56,7 @@ import {
 	normalizeThemePreference,
 	sameModel,
 } from "@thinkrail/contracts";
-import { t } from "@thinkrail/locales/react";
+import { currentTranslator, t } from "@thinkrail/locales/react";
 import { create } from "zustand";
 import type { LoginState } from "../auth";
 import { assistantFailureText } from "../chat/assistantFailure";
@@ -510,7 +510,7 @@ function removeSupersededAssistant(
 		(turn) =>
 			turn.id === attemptAssistantId &&
 			turn.kind === "assistant" &&
-			assistantFailureText(turn.message) !== null,
+			assistantFailureText(currentTranslator(), turn.message) !== null,
 	);
 	return index < 0 ? turns : [...turns.slice(0, index), ...turns.slice(index + 1)];
 }
@@ -774,7 +774,7 @@ export function reduceSessionEvent(rt: SessionRuntime, event: PiEvent): SessionR
 		case "agent_end":
 			return rt;
 		case "agent_settled": {
-			const failure = assistantFailureText(event.terminal);
+			const failure = assistantFailureText(currentTranslator(), event.terminal);
 			const closer: ChatTurn = failure
 				? {
 						kind: "error",

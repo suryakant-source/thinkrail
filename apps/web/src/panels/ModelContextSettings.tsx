@@ -9,7 +9,7 @@ import {
 	type WsMethodMap,
 } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { currentLocale, t as translate, useT } from "@thinkrail/locales/react";
+import { localeOf, type Translator, t as translate, useT } from "@thinkrail/locales/react";
 import { Button } from "@thinkrail/ui/button";
 import { cn } from "@thinkrail/ui/utils";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
@@ -31,9 +31,9 @@ const PRESETS = [
 	override: number | null | undefined;
 }[];
 
-const tokens = (value: number) => value.toLocaleString(currentLocale());
-const tokenRange = () =>
-	`${tokens(MODEL_CONTEXT_WINDOW_LIMITS.min)}–${tokens(MODEL_CONTEXT_WINDOW_LIMITS.max)}`;
+const tokens = (t: Translator, value: number) => value.toLocaleString(localeOf(t));
+const tokenRange = (t: Translator) =>
+	`${tokens(t, MODEL_CONTEXT_WINDOW_LIMITS.min)}–${tokens(t, MODEL_CONTEXT_WINDOW_LIMITS.max)}`;
 
 function supported(protocolVersion: number | null): boolean {
 	return protocolVersion !== null && protocolVersion >= CONTEXT_WINDOW_SETTINGS_PROTOCOL_VERSION;
@@ -63,7 +63,7 @@ function ContextLimitControl({
 	onChange: (override: number | null) => void;
 }) {
 	const t = useT();
-	const range = tokenRange();
+	const range = tokenRange(t);
 	const id = useId();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const restoreFocus = useRef<HTMLElement | null>(null);
@@ -291,7 +291,7 @@ export function ModelContextControls({
 					summary: sharedSummary,
 					external: t("settings.modelContext.externalKept", {
 						count: external,
-						range: tokenRange(),
+						range: tokenRange(t),
 					}),
 				})
 			: sharedSummary;
@@ -368,11 +368,11 @@ export function ModelContextControls({
 											model.override === null
 												? t("settings.modelContext.modelDescriptionDefault", {
 														provider: model.provider,
-														tokens: tokens(model.contextWindow),
+														tokens: tokens(t, model.contextWindow),
 													})
 												: t("settings.modelContext.modelDescription", {
 														provider: model.provider,
-														tokens: tokens(model.contextWindow),
+														tokens: tokens(t, model.contextWindow),
 													})
 										}
 										override={model.override}

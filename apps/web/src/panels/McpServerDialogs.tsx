@@ -10,7 +10,7 @@ import type {
 	McpServerSummary,
 } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { T, t as translate, useT } from "@thinkrail/locales/react";
+import { T, type Translator, useT } from "@thinkrail/locales/react";
 import { Button } from "@thinkrail/ui/button";
 import {
 	Dialog,
@@ -115,8 +115,8 @@ function DialogBody({ children }: { children: ReactNode }) {
 	);
 }
 
-function runLabel(label: string): string {
-	return label === "command" ? translate("mcp.run.onHost") : translate("mcp.run.fills", { label });
+function runLabel(t: Translator, label: string): string {
+	return label === "command" ? t("mcp.run.onHost") : t("mcp.run.fills", { label });
 }
 
 function CommandSpeedHint() {
@@ -214,7 +214,7 @@ export function McpRunReview({
 									data-testid="mcp-run-item"
 									className="flex flex-col gap-2"
 								>
-									<span className="text-text-muted tr-text-metadata">{runLabel(run.label)}</span>
+									<span className="text-text-muted tr-text-metadata">{runLabel(t, run.label)}</span>
 									<CodeBlock>{run.text}</CodeBlock>
 								</li>
 							))}
@@ -383,7 +383,7 @@ function McpForm({
 				<Segments
 					testId="mcp-form-exposure"
 					value={draft.exposure}
-					options={MCP_EXPOSURES.map((id) => ({ id, label: mcpExposureLabel(id) }))}
+					options={MCP_EXPOSURES.map((id) => ({ id, label: mcpExposureLabel(t, id) }))}
 					onChange={(exposure) => onChange({ ...draft, exposure })}
 				/>
 			</Field>
@@ -416,7 +416,7 @@ function McpImport({
 	onChange: (text: string) => void;
 }) {
 	const t = useT();
-	const parsed = text.trim() ? parseMcpServersJson(text) : null;
+	const parsed = text.trim() ? parseMcpServersJson(t, text) : null;
 	const names = parsed?.ok ? parsed.servers.map((server) => server.name) : [];
 	return (
 		<div className="flex flex-col gap-12" data-testid="mcp-add-json">
@@ -442,7 +442,7 @@ function McpImport({
 			{parsed?.ok ? (
 				<ul className="flex flex-col gap-4" data-testid="mcp-json-preview">
 					{parsed.servers.map((server) => {
-						const issues = importIssues(server, scope, existing, names);
+						const issues = importIssues(t, server, scope, existing, names);
 						const facts = mcpApprovalFacts(server.entry);
 						const values = [...facts.env, ...facts.headers].map((fact) => fact.name);
 						return (
@@ -625,18 +625,19 @@ export function McpAddDialog({
 		);
 	}, [projectScopeAvailable]);
 
-	const issues = validateMcpDraft(draft, scope, existing);
+	const issues = validateMcpDraft(t, draft, scope, existing);
 	const warnings = [
-		...mcpDraftWarnings(draft),
-		...[mcpNameWarning(draft.name.trim(), scope, existing)].filter(
+		...mcpDraftWarnings(t, draft),
+		...[mcpNameWarning(t, draft.name.trim(), scope, existing)].filter(
 			(warning): warning is string => !!warning,
 		),
 	];
-	const parsed = json.trim() ? parseMcpServersJson(json) : null;
+	const parsed = json.trim() ? parseMcpServersJson(t, json) : null;
 	const parsedServers = parsed?.ok ? parsed.servers : [];
 	const importable = parsedServers.filter(
 		(server) =>
 			importIssues(
+				t,
 				server,
 				scope,
 				existing,
@@ -842,6 +843,7 @@ export interface McpEditTarget {
 }
 
 function editErrors(
+	t: Translator,
 	text: string,
 	written: McpServerEntryInput,
 ): { entry: McpServerEntryInput | null; errors: string[] } {
@@ -852,17 +854,17 @@ function editErrors(
 		return {
 			entry: null,
 			errors: [
-				translate("mcp.entries.invalidJson", {
+				t("mcp.entries.invalidJson", {
 					error: error instanceof Error ? error.message : String(error),
 				}),
 			],
 		};
 	}
-	const errors = mcpEntryErrors(parsed);
+	const errors = mcpEntryErrors(t, parsed);
 	if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
 		return { entry: null, errors };
 	}
-	const edited = mcpEditedEntry(parsed as McpServerEntryInput, written);
+	const edited = mcpEditedEntry(t, parsed as McpServerEntryInput, written);
 	return { entry: edited.entry, errors: [...errors, ...edited.issues] };
 }
 
@@ -887,7 +889,7 @@ export function McpEditDialog({
 	} | null>(null);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const { entry, errors } = editErrors(text, target.entry);
+	const { entry, errors } = editErrors(t, text, target.entry);
 	const { name } = target.summary;
 
 	const commit = async (next: McpServerEntryInput) => {
@@ -1060,12 +1062,12 @@ export function McpApproveDialog({
 								</FactRow>
 							) : null}
 							{facts.defines === "command" ? (
-								<FactRow label={runLabel("command")}>
+								<FactRow label={runLabel(t, "command")}>
 									<CodeBlock testId="mcp-approve-run">{summary.endpoint}</CodeBlock>
 								</FactRow>
 							) : null}
 							{facts.runs.map((run) => (
-								<FactRow key={`${run.label}:${run.text}`} label={runLabel(run.label)}>
+								<FactRow key={`${run.label}:${run.text}`} label={runLabel(t, run.label)}>
 									<CodeBlock testId="mcp-approve-run">{run.text}</CodeBlock>
 								</FactRow>
 							))}
@@ -1163,12 +1165,12 @@ export function McpDetailsDialog({
 						</FactRow>
 						<FactRow label={t("mcp.details.effectiveExposure")}>
 							<span data-testid="mcp-details-exposure">
-								{mcpExposureLabel(summary.effectiveExposure)}
+								{mcpExposureLabel(t, summary.effectiveExposure)}
 							</span>
 						</FactRow>
 						{summary.exposure !== summary.effectiveExposure ? (
 							<FactRow label={t("mcp.details.configuredExposure")}>
-								{mcpConfiguredExposureText(summary)}
+								{mcpConfiguredExposureText(t, summary)}
 							</FactRow>
 						) : null}
 						{summary.projectOverride ? (

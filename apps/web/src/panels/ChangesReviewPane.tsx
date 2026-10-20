@@ -384,7 +384,7 @@ export function ChangesReviewPane({ tab }: { tab: ChangesTab }) {
 					data-testid="changes-review-scope"
 					className="flex min-w-0 shrink items-baseline gap-4 truncate tr-text-metadata"
 				>
-					<span className="text-text-default">{scopeLabel(scope, [], turns)}</span>
+					<span className="text-text-default">{scopeLabel(t, scope, [], turns)}</span>
 					{targetLabel ? <span className="truncate text-text-muted">{targetLabel}</span> : null}
 				</span>
 				{status ? (

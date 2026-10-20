@@ -1,10 +1,10 @@
 import type { McpServerState } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 
 export type McpStateTone = "success" | "working" | "warning" | "error" | "info" | "neutral";
 
-const MCP_STATE_KEY = {
+export const MCP_STATE_KEY: Readonly<Record<McpServerState, MessageKey>> = {
 	starting: "lib.mcpState.starting",
 	connected: "lib.mcpState.connected",
 	"needs-sign-in": "lib.mcpState.needsSignIn",
@@ -19,17 +19,11 @@ const MCP_STATE_KEY = {
 	"not-running": "lib.mcpState.notRunning",
 	"handled-elsewhere": "lib.mcpState.handledElsewhere",
 	unknown: "common.unknown",
-} satisfies Record<McpServerState, MessageKey>;
+};
 
-export const MCP_STATE_LABEL: Readonly<Record<McpServerState, string>> = Object.defineProperties(
-	{} as Record<McpServerState, string>,
-	Object.fromEntries(
-		Object.entries(MCP_STATE_KEY).map(([state, key]) => [
-			state,
-			{ enumerable: true, get: () => t(key) },
-		]),
-	),
-);
+export function mcpStateLabel(t: Translator, state: McpServerState): string {
+	return t(MCP_STATE_KEY[state]);
+}
 
 const MCP_STATE_TONE: Readonly<Record<McpServerState, McpStateTone>> = {
 	starting: "working",
@@ -60,12 +54,12 @@ export function isMcpActiveState(state: McpServerState): boolean {
 	return state === "connected" || state === "starting";
 }
 
-export function mcpToolCountLabel(count: number): string {
+export function mcpToolCountLabel(t: Translator, count: number): string {
 	return t("lib.mcpState.toolCount", { count });
 }
 
-export function mcpStatusLabel(state: McpServerState, toolCount?: number): string {
+export function mcpStatusLabel(t: Translator, state: McpServerState, toolCount?: number): string {
 	return state === "connected" && toolCount !== undefined
 		? t("lib.mcpState.connectedWithTools", { count: toolCount })
-		: MCP_STATE_LABEL[state];
+		: mcpStateLabel(t, state);
 }

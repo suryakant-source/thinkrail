@@ -1,4 +1,4 @@
-import { t as translate, useT } from "@thinkrail/locales/react";
+import { type Translator, useT } from "@thinkrail/locales/react";
 import { useMemo } from "react";
 import type { ResourceContent, ResourceDiffProps } from "@/resources";
 import { diffContentStamp } from "../reviewComposerState";
@@ -31,12 +31,12 @@ function SvgContent({
 	return <SvgFrame title={t("viewer.svg.diffTitle", { path })} document={document} />;
 }
 
-function caption(side: "old" | "new", text: string | null): string {
+function caption(t: Translator, side: "old" | "new", text: string | null): string {
 	const key = side === "old" ? "viewer.side.oldCaption" : "viewer.side.newCaption";
-	if (text === null) return translate(key, { detail: translate("viewer.image.noImage") });
+	if (text === null) return t(key, { detail: t("viewer.image.noImage") });
 	const size = svgIntrinsicSize(text);
-	const dimensions = size ? `${size.width} × ${size.height}` : translate("viewer.svg.flexibleSize");
-	return translate(key, { detail: `${dimensions} · ${svgByteLength(text)} B` });
+	const dimensions = size ? `${size.width} × ${size.height}` : t("viewer.svg.flexibleSize");
+	return t(key, { detail: `${dimensions} · ${svgByteLength(text)} B` });
 }
 
 export default function SvgDiff({
@@ -61,7 +61,7 @@ export default function SvgDiff({
 			originalText === null ? null : (
 				<SvgContent text={originalText} tokens={tokens} path={resource.path} />
 			),
-		caption: caption("old", originalText),
+		caption: caption(t, "old", originalText),
 		intrinsicSize: originalSize,
 		review: review?.base,
 	};
@@ -71,7 +71,7 @@ export default function SvgDiff({
 			modifiedText === null ? null : (
 				<SvgContent text={modifiedText} tokens={tokens} path={resource.path} />
 			),
-		caption: caption("new", modifiedText),
+		caption: caption(t, "new", modifiedText),
 		intrinsicSize: modifiedSize,
 		review: review?.worktree,
 	};

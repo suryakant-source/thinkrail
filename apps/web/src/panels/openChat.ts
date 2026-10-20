@@ -1,4 +1,4 @@
-import { t } from "@thinkrail/locales/react";
+import { currentTranslator, t } from "@thinkrail/locales/react";
 import { messagesToRuntime } from "../chat/hydrate";
 import {
 	type CenterNavigationStamp,
@@ -102,7 +102,7 @@ export async function openChatInTab(
 			: routed;
 		current.hydrateSession(
 			summary,
-			messagesToRuntime(messages, summary.lastSettlement),
+			messagesToRuntime(currentTranslator(), messages, summary.lastSettlement),
 			true,
 			summary.live ? undefined : syncedTick,
 			effectiveOptions,

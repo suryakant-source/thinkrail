@@ -6,7 +6,7 @@ import type {
 	LayoutToolId,
 } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 import { isPreviewCompatibleTabKind } from "../../lib";
 import {
 	collectAllGroups,
@@ -113,7 +113,7 @@ const BUILTIN_PRESET_NAME_KEYS: Readonly<Record<string, MessageKey>> = {
 	review: "workbench.preset.review",
 };
 
-export function layoutPresetName(preset: LayoutPreset): string {
+export function layoutPresetName(t: Translator, preset: LayoutPreset): string {
 	const key = BUILTIN_LAYOUT_PRESETS.some((builtin) => builtin.id === preset.id)
 		? BUILTIN_PRESET_NAME_KEYS[preset.id]
 		: undefined;

@@ -101,7 +101,7 @@ export function AuxiliaryRailButton({
 	const active = entry.selected && entry.expanded;
 	const name =
 		entry.kind === "tool"
-			? layoutTabName(toolTab(entry.tool))
+			? layoutTabName(t, toolTab(entry.tool))
 			: entry.kind === "terminals"
 				? t("workbench.rail.terminalGroup", { ordinal, count: entry.tabs.length })
 				: entry.region === "bottom"
@@ -116,7 +116,7 @@ export function AuxiliaryRailButton({
 						<span>
 							{name}
 							<br />
-							{entry.tabs.map((tab) => layoutTabName(tab)).join(", ")}
+							{entry.tabs.map((tab) => layoutTabName(t, tab)).join(", ")}
 						</span>
 					) : (
 						name

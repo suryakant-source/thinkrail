@@ -340,7 +340,7 @@ export const TabStrip = memo(function TabStrip({
 									<CommandItem
 										key={tab.id}
 										value={tab.id}
-										keywords={tabSearchKeywords(tab)}
+										keywords={tabSearchKeywords(t, tab)}
 										onSelect={() => {
 											overflowFocusTarget.current = tab.id;
 											selectTab(tab.id);
@@ -348,7 +348,7 @@ export const TabStrip = memo(function TabStrip({
 										}}
 									>
 										{tabIcon(tab)}
-										<span className="truncate">{layoutTabName(tab)}</span>
+										<span className="truncate">{layoutTabName(t, tab)}</span>
 									</CommandItem>
 								))}
 							</CommandList>
@@ -568,8 +568,8 @@ export const WorkbenchTab = memo(function WorkbenchTab({
 		? document[currentAuxiliary].groups.findIndex((group) => group.id === location.groupId)
 		: -1;
 	const currentAuxiliaryLimit = currentAuxiliary === "bottom" ? maxBottomGroups : maxSideGroups;
-	const name = layoutTabName(tab);
-	const groupRemoval = removeLayoutGroup(document, location);
+	const name = layoutTabName(t, tab);
+	const groupRemoval = removeLayoutGroup(t, document, location);
 
 	const move = (target: LayoutGroupLocation, targetIndex?: number) => {
 		const result = moveTabToGroup(document, tab, target, targetIndex);
@@ -808,17 +808,17 @@ export const WorkbenchTab = memo(function WorkbenchTab({
 				{moveTargets.map((group) => {
 					const separate = group.location.area !== "center" && !canJoinAuxiliaryGroup(group, tab);
 					const label = t(MOVE_TO_PANE_LABELS[group.location.area], {
-						group: describeLayoutGroup(group.tabs),
+						group: describeLayoutGroup(t, group.tabs),
 					});
 					return (
 						<ContextMenuItem
 							key={tupleKey("move-target", group.location.area, group.location.groupId)}
 							disabled={separate}
-							title={separate ? separatePanesReason() : undefined}
+							title={separate ? separatePanesReason(t) : undefined}
 							onSelect={() => move(group.location)}
 						>
 							{separate
-								? t("workbench.menu.unavailable", { label, reason: separatePanesReason() })
+								? t("workbench.menu.unavailable", { label, reason: separatePanesReason(t) })
 								: label}
 						</ContextMenuItem>
 					);
@@ -943,7 +943,7 @@ export const WorkbenchTab = memo(function WorkbenchTab({
 						<ContextMenuSeparator />
 						{missingTools.map((tool) => (
 							<ContextMenuItem key={tool} onSelect={() => onRevealTool(tool)}>
-								{t("workbench.tab.showTool", { name: layoutTabName(toolTab(tool)) })}
+								{t("workbench.tab.showTool", { name: layoutTabName(t, toolTab(tool)) })}
 							</ContextMenuItem>
 						))}
 					</>

@@ -306,7 +306,7 @@ function EffortSlider({
 
 function RowMeta({ model, withProvider }: { model: WireModel; withProvider: boolean }) {
 	const t = useT();
-	const kind = kindLabel(model);
+	const kind = kindLabel(t, model);
 	const cost = costLabel(model);
 	return (
 		<span className="flex min-w-0 items-center gap-4 truncate text-text-muted tr-text-metadata">
@@ -373,11 +373,11 @@ export const ModelEffortPicker = forwardRef<ModelEffortPickerHandle, ModelEffort
 			setShowAll(false);
 		};
 
-		const providers = useMemo(() => groupByProvider(models).map((g) => g.provider), [models]);
+		const providers = useMemo(() => groupByProvider(t, models).map((g) => g.provider), [t, models]);
 		const shortlist = preferences.favorites.length > 0 || preferences.recents.length > 0;
 		const folded = shortlist && !showAll && query.trim() === "";
 		const searching = query !== "";
-		const groups = pickerGroups(models, {
+		const groups = pickerGroups(t, models, {
 			pinned: preferences.favorites,
 			query,
 			expansion,
@@ -412,7 +412,7 @@ export const ModelEffortPicker = forwardRef<ModelEffortPickerHandle, ModelEffort
 					data-testid="model-option"
 					data-model-id={model.id}
 					data-provider={model.provider}
-					title={describeAuth(model) ?? undefined}
+					title={describeAuth(t, model) ?? undefined}
 					onSelect={() => pickModel(model)}
 					className={cn(
 						"group/row items-start gap-8 py-4",
@@ -530,7 +530,7 @@ export const ModelEffortPicker = forwardRef<ModelEffortPickerHandle, ModelEffort
 								{pillLevel}
 							</span>
 							{hasKindGlyph(pillModel) ? (
-								<IconTooltip label={describeAuth(pillModel)} wrapTrigger>
+								<IconTooltip label={describeAuth(t, pillModel)} wrapTrigger>
 									<KindGlyph model={pillModel} className="text-text-muted" />
 								</IconTooltip>
 							) : null}

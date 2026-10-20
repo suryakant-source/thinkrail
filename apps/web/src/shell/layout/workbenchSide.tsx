@@ -144,7 +144,7 @@ export const SideGroupView = memo(function SideGroupView({
 			id={groupDomId(location)}
 			tabIndex={-1}
 			aria-label={t(PANE_LABELS[side], {
-				name: selected ? layoutTabName(selected) : t("workbench.pane.tools"),
+				name: selected ? layoutTabName(t, selected) : t("workbench.pane.tools"),
 			})}
 			data-testid={
 				group.tabs.some((tab) => tab.kind === "tool" && tab.tool === "specs")
@@ -248,7 +248,7 @@ export function SideGroupMenu({
 						data-testid={`show-tool-${tool}`}
 						onSelect={() => onRevealTool(tool)}
 					>
-						{t("workbench.tab.showTool", { name: layoutTabName(toolTab(tool)) })}
+						{t("workbench.tab.showTool", { name: layoutTabName(t, toolTab(tool)) })}
 					</DropdownMenuItem>
 				))}
 			</DropdownMenuContent>
@@ -284,7 +284,7 @@ export function AuxiliaryGroupHeader({
 		data: { target: { kind: "group", location } satisfies DropTarget },
 		disabled: !dropEnabled,
 	});
-	const removal = removeLayoutGroup(shared.document, location);
+	const removal = removeLayoutGroup(t, shared.document, location);
 	const actions = (
 		<>
 			<SideGroupMenu
@@ -353,7 +353,7 @@ export function AuxiliaryGroupHeader({
 			ref={setNodeRef}
 			title={
 				selected
-					? layoutTabName(selected)
+					? layoutTabName(t, selected)
 					: region === "bottom"
 						? t("workbench.rail.terminal")
 						: t("workbench.pane.tools")

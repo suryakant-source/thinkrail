@@ -1,5 +1,5 @@
 import type { MessageKey } from "@thinkrail/locales";
-import { t } from "@thinkrail/locales/react";
+import { currentTranslator, type Translator, t } from "@thinkrail/locales/react";
 import {
 	isPreviewCompatibleTabKind,
 	type LayoutAttention,
@@ -105,7 +105,7 @@ const LAYOUT_TOOL_NAME_KEYS = {
 	plan: "workbench.tool.plan",
 } as const satisfies Record<LayoutToolId, MessageKey>;
 
-export function layoutTabName(tab: LayoutTab): string {
+export function layoutTabName(t: Translator, tab: LayoutTab): string {
 	return tab.kind === "tool" ? t(LAYOUT_TOOL_NAME_KEYS[tab.tool]) : tab.name;
 }
 
@@ -321,6 +321,7 @@ function removeTabEverywhere(
 }
 
 export function removeLayoutGroup(
+	t: Translator,
 	document: WorkspaceLayoutDocument,
 	location: LayoutGroupLocation,
 ): LayoutOperationResult {
@@ -562,13 +563,13 @@ export function canPlaceLayoutTab(tab: LayoutTab, area: "center" | LayoutAuxilia
 	return tab.kind === "tool" || tab.kind === "terminal";
 }
 
-export function separatePanesReason(): string {
+export function separatePanesReason(t: Translator): string {
 	return t("workbench.layout.separatePanes");
 }
 
-export function describeLayoutGroup(tabs: readonly LayoutTab[], limit = 3): string {
+export function describeLayoutGroup(t: Translator, tabs: readonly LayoutTab[], limit = 3): string {
 	if (tabs.length === 0) return t("workbench.layout.emptyGroupSummary");
-	const names = tabs.slice(0, limit).map((tab) => layoutTabName(tab));
+	const names = tabs.slice(0, limit).map((tab) => layoutTabName(t, tab));
 	const rest = tabs.length - names.length;
 	const list = names.join(", ");
 	return rest > 0
@@ -668,7 +669,8 @@ export function moveTabToGroup(
 	}
 	const group = groups[groupIndex];
 	if (!group) return { reason: t("workbench.layout.destinationGroupMissing") };
-	if (!canJoinAuxiliaryGroup(group, movingTab)) return { reason: separatePanesReason() };
+	if (!canJoinAuxiliaryGroup(group, movingTab))
+		return { reason: separatePanesReason(currentTranslator()) };
 	const insertion = Math.max(0, Math.min(index ?? group.tabs.length, group.tabs.length));
 	const tabs = [...group.tabs];
 	tabs.splice(insertion, 0, movingTab);

@@ -21,7 +21,7 @@ export function AgentCard({ toolCallId, args, result, status }: ToolRenderProps)
 	const task = details?.task || strArg(args, "task");
 	const terminal = details !== undefined && isTerminalRunStatus(details.status);
 	const backgroundAck = args.run_in_background === true && details !== undefined && !terminal;
-	const meta = details ? [details.model, ...runCounters(details, "split")].filter(Boolean) : [];
+	const meta = details ? [details.model, ...runCounters(t, details, "split")].filter(Boolean) : [];
 	const output = resultText(result);
 	const [reportOpen, toggleReport, reportToggleRef] = useFold(`${toolCallId}:report`, false);
 

@@ -6,7 +6,7 @@ import {
 } from "@remixicon/react";
 import type { HistoryScope, MessageHit, PromptHit } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { useT } from "@thinkrail/locales/react";
+import { type Translator, useT } from "@thinkrail/locales/react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -39,8 +39,6 @@ const SCOPE_MENU_LABELS = {
 	project: "chat.history.scopeMenu.project",
 	all: "chat.history.scopeMenu.all",
 } satisfies Record<HistoryScope["kind"], MessageKey>;
-
-type Translate = ReturnType<typeof useT>;
 
 const SAVE_SHORTCUT_LABEL = platformShortcutLabel("S");
 
@@ -159,7 +157,7 @@ function PromptRow({
 					</span>
 				) : null}
 				<span className="shrink-0 text-text-muted tr-text-metadata">
-					{relativeTime(hit.timestamp, now)}
+					{relativeTime(t, hit.timestamp, now)}
 				</span>
 			</button>
 			{isSelected ? (
@@ -264,7 +262,7 @@ function MessageRow({
 					<span>·</span>
 					<span>{hit.role}</span>
 					<span>·</span>
-					<span>{relativeTime(hit.timestamp, now)}</span>
+					<span>{relativeTime(t, hit.timestamp, now)}</span>
 					{unmapped ? <span>{t("chat.history.unmapped")}</span> : null}
 				</span>
 				<span className="overflow-hidden whitespace-nowrap text-ellipsis">
@@ -293,7 +291,7 @@ function PromptPreviewFooter({
 	const parts = [
 		hit.sessionTitle,
 		hit.workspaceId ? (workspaceName ?? t("chat.history.workspaceFallback")) : undefined,
-		relativeTime(hit.timestamp, now),
+		relativeTime(t, hit.timestamp, now),
 	].filter((part): part is string => !!part);
 	return <>{parts.join(" · ")}</>;
 }
@@ -322,7 +320,7 @@ function HistoryPreview({
 						{item.kind === "prompt" ? (
 							<PromptPreviewFooter hit={item.hit} workspaceName={workspaceName} />
 						) : (
-							messageCrumb(item.hit, now, t)
+							messageCrumb(t, item.hit, now)
 						)}
 					</div>
 				</>
@@ -331,8 +329,8 @@ function HistoryPreview({
 	);
 }
 
-function messageCrumb(hit: MessageHit, now: number, t: Translate): string {
-	return `${hit.sessionTitle || hit.cwd.split("/").pop() || t("chat.history.sessionFallback")} · ${hit.role} · ${relativeTime(hit.timestamp, now)}`;
+function messageCrumb(t: Translator, hit: MessageHit, now: number): string {
+	return `${hit.sessionTitle || hit.cwd.split("/").pop() || t("chat.history.sessionFallback")} · ${hit.role} · ${relativeTime(t, hit.timestamp, now)}`;
 }
 
 export interface HistoryOverlayProps {

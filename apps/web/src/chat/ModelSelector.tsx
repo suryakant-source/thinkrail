@@ -8,7 +8,7 @@ import {
 	RiStarLine as StarLine,
 } from "@remixicon/react";
 import { sameModel, type WireModel } from "@thinkrail/contracts";
-import { useT } from "@thinkrail/locales/react";
+import { type Translator, useT } from "@thinkrail/locales/react";
 import {
 	Command,
 	CommandEmpty,
@@ -38,7 +38,7 @@ import {
 } from "./pickerGroups";
 import type { ModelPreferences } from "./useModelPreferences";
 
-function subLine(model: WireModel, t: ReturnType<typeof useT>): string {
+function subLine(t: Translator, model: WireModel): string {
 	const parts = [t("chat.modelPicker.context", { size: formatContext(model.contextWindow) })];
 	if (model.reasoning) parts.push(t("chat.modelPicker.reasoning"));
 	return parts.join(" · ");
@@ -86,7 +86,7 @@ export function ModelSelector({
 
 	const pinnedModels = preferences?.favorites ?? [];
 	const searching = query !== "";
-	const groups = pickerGroups(models, {
+	const groups = pickerGroups(t, models, {
 		pinned: pinnedModels,
 		query,
 		expansion,
@@ -124,7 +124,7 @@ export function ModelSelector({
 				)}
 				<span className="flex min-w-0 flex-1 flex-col">
 					<span className="truncate">{model.name}</span>
-					<span className="truncate text-text-muted tr-text-metadata">{subLine(model, t)}</span>
+					<span className="truncate text-text-muted tr-text-metadata">{subLine(t, model)}</span>
 				</span>
 				<span className="mt-2 shrink-0 text-text-subtle tr-text-metadata">{model.id}</span>
 				{isCurrent ? <Check className="mt-2 size-14 shrink-0 text-primary" /> : null}

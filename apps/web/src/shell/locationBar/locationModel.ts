@@ -1,5 +1,5 @@
 import type { OpenBranchReview } from "@thinkrail/contracts";
-import { t } from "@thinkrail/locales/react";
+import { type Translator, t } from "@thinkrail/locales/react";
 import { isOpenBranchReview } from "../../panels/useOpenBranchReview";
 
 export interface RemoteCounts {
@@ -24,7 +24,7 @@ export function reviewTone(review: OpenBranchReview): ReviewTone {
 	return review.state === "merged" ? "info" : review.state === "closed" ? "neutral" : "success";
 }
 
-export function reviewStateLabel(review: OpenBranchReview): string {
+export function reviewStateLabel(t: Translator, review: OpenBranchReview): string {
 	return review.state === "merged"
 		? t("shell.location.review.merged")
 		: review.state === "closed"
@@ -33,7 +33,7 @@ export function reviewStateLabel(review: OpenBranchReview): string {
 }
 
 /** `PR #12` while open; `Merged #12` / `Closed #12` afterwards (MRs keep their `!`). */
-export function reviewChipLabel(review: OpenBranchReview): string {
+export function reviewChipLabel(t: Translator, review: OpenBranchReview): string {
 	const ref = `${review.kind === "pull-request" ? "#" : "!"}${review.number}`;
 	if (isOpenBranchReview(review)) {
 		return review.kind === "pull-request"

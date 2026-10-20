@@ -174,7 +174,7 @@ export function DiffPane({ tab }: { tab: DiffTab }) {
 							<ToggleSegment
 								key={candidate.id}
 								testid={rendererTestId(candidate.id)}
-								label={candidate.label}
+								label={t(candidate.labelKey)}
 								active={candidate.id === renderer.id}
 								onClick={() => setTabRenderer(tab.workspaceId, tab.id, candidate.id)}
 							/>

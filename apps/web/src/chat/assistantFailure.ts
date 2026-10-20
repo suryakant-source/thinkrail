@@ -1,5 +1,5 @@
 import type { StopReason } from "@thinkrail/contracts";
-import { t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 
 interface AssistantTerminal {
 	stopReason: StopReason;
@@ -7,6 +7,7 @@ interface AssistantTerminal {
 }
 
 export function assistantFailureText(
+	t: Translator,
 	terminal: AssistantTerminal | null | undefined,
 ): string | null {
 	if (terminal?.stopReason === "error") {

@@ -163,7 +163,7 @@ change. `dist/` therefore has no profiler timers (`actualStartTime` is absent fr
 - `resources` → `contracts` (types only), `lib`; it owns no store, transport, shell, or renderer implementation
 - `lib` → `themes` (the lazy highlighter uses the one generic CSS-variable Shiki registration), React (the phone-viewport hook only), and `contracts` (types only, e.g. the MCP state vocabulary's `McpServerState`)
 - `themes` → `constants` (the branding storage prefix scopes the first-paint hint), `clientPreferences` (native-stable hint storage)
-- `i18n` → `store`, `contracts` (types), `@thinkrail/locales`; `transport` hydrates the store's local-language snapshot, `main.tsx` mounts `LocaleBoundary` around the app and `panels` renders the Language page from its pure derivations
+- `i18n` → `store`, `contracts` (types), `@thinkrail/locales`; `transport` hydrates the store's local-language snapshot, `main.tsx`'s `App` mounts `useLocaleSync` once and `panels` renders the Language page from its pure derivations
 - **Any module may → `@thinkrail/locales/react`** (`useT`, `<T>`, `currentLocale`) for its UI text — the one cross-cutting edge besides `lib`; user-facing text is never a literal ([[architecture]] Decision 22)
 - leaves (`clientPreferences`, `constants`, `utils`, `styles`) → none internal
 

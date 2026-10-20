@@ -6,8 +6,8 @@ import type {
 	WsParams,
 } from "@thinkrail/contracts";
 import type { MessageKey } from "@thinkrail/locales";
-import { t } from "@thinkrail/locales/react";
-import { MCP_STATE_LABEL, type McpStateTone, mcpStateTone, mcpToolCountLabel } from "@/lib";
+import { type Translator, t } from "@thinkrail/locales/react";
+import { type McpStateTone, mcpStateLabel, mcpStateTone, mcpToolCountLabel } from "@/lib";
 import type { McpServerRow } from "@/store";
 import { type McpEditableExposure, withEnabled, withExposure } from "./mcpEntries";
 
@@ -31,7 +31,7 @@ export interface McpRowView {
 
 const DISABLED_IN_PI_SETTINGS = "pi settings (-builtin:mcp)";
 
-export function mcpHandledElsewhereText(by: string): string {
+export function mcpHandledElsewhereText(t: Translator, by: string): string {
 	return by === DISABLED_IN_PI_SETTINGS
 		? t("mcp.handledElsewhere.piSettings")
 		: t("mcp.handledElsewhere.by", { by });
@@ -73,14 +73,14 @@ function mcpDetailReason(detail: string | undefined, name: string): string | und
 	return body.replace(STATUS_LINE_TAIL, "").replace(STATE_PREFIX, "").trim() || undefined;
 }
 
-export function formatStartingElapsed(ms: number): string {
+export function formatStartingElapsed(t: Translator, ms: number): string {
 	const minutes = Math.floor(Math.max(0, ms) / 60_000);
 	return minutes < 1 ? t("mcp.elapsed.underMinute") : t("mcp.elapsed.minutes", { minutes });
 }
 
-export function mcpRowView(row: McpServerRow, now: number): McpRowView {
+export function mcpRowView(t: Translator, row: McpServerRow, now: number): McpRowView {
 	const { summary } = row;
-	const view = baseView(row, now);
+	const view = baseView(t, row, now);
 	if (
 		row.approvalPending &&
 		row.state !== "pending-approval" &&
@@ -98,7 +98,7 @@ export function mcpRowView(row: McpServerRow, now: number): McpRowView {
 	return view;
 }
 
-function baseView(row: McpServerRow, now: number): McpRowView {
+function baseView(t: Translator, row: McpServerRow, now: number): McpRowView {
 	const { summary } = row;
 	const http = summary.transport === "http";
 	switch (row.state) {
@@ -109,11 +109,11 @@ function baseView(row: McpServerRow, now: number): McpRowView {
 				reason: t("mcp.row.replacedReason"),
 			};
 		case "handled-elsewhere":
-			return { label: MCP_STATE_LABEL["handled-elsewhere"], tone: "neutral" };
+			return { label: mcpStateLabel(t, "handled-elsewhere"), tone: "neutral" };
 		case "starting":
 			return {
 				label: t("mcp.row.starting", {
-					elapsed: formatStartingElapsed(now - (row.startingSince ?? now)),
+					elapsed: formatStartingElapsed(t, now - (row.startingSince ?? now)),
 				}),
 				tone: "working",
 				...(row.sessions.total > 1
@@ -126,7 +126,7 @@ function baseView(row: McpServerRow, now: number): McpRowView {
 					: {}),
 			};
 		case "connected": {
-			const tools = row.toolCount === undefined ? "" : ` · ${mcpToolCountLabel(row.toolCount)}`;
+			const tools = row.toolCount === undefined ? "" : ` · ${mcpToolCountLabel(t, row.toolCount)}`;
 			const connected =
 				row.sessions.total > 1
 					? t("mcp.row.connectedInChats", {
@@ -142,14 +142,14 @@ function baseView(row: McpServerRow, now: number): McpRowView {
 		}
 		case "needs-sign-in":
 			return {
-				label: MCP_STATE_LABEL["needs-sign-in"],
+				label: mcpStateLabel(t, "needs-sign-in"),
 				tone: "warning",
 				reason: t("mcp.row.signInReason"),
 				...(row.effective && summary.oauth ? { action: "sign-in" as const } : {}),
 			};
 		case "failed":
 			return {
-				label: MCP_STATE_LABEL.failed,
+				label: mcpStateLabel(t, "failed"),
 				tone: "error",
 				reason: mcpDetailReason(row.detail, summary.name) ?? t("mcp.row.failedReason"),
 				action: "reconnect",
@@ -157,20 +157,20 @@ function baseView(row: McpServerRow, now: number): McpRowView {
 			};
 		case "disconnected":
 			return {
-				label: MCP_STATE_LABEL.disconnected,
+				label: mcpStateLabel(t, "disconnected"),
 				tone: "warning",
 				reason: t("mcp.row.disconnectedReason"),
 				action: "reconnect",
 			};
 		case "disabled":
 			return {
-				label: MCP_STATE_LABEL.disabled,
+				label: mcpStateLabel(t, "disabled"),
 				tone: "neutral",
 				reason: t("mcp.row.disabledReason"),
 			};
 		case "disabled-in-project":
 			return {
-				label: MCP_STATE_LABEL["disabled-in-project"],
+				label: mcpStateLabel(t, "disabled-in-project"),
 				tone: "neutral",
 				reason: t("mcp.row.disabledInProjectReason"),
 			};
@@ -195,28 +195,28 @@ function baseView(row: McpServerRow, now: number): McpRowView {
 						action: "review",
 					}
 				: {
-						label: MCP_STATE_LABEL["pending-approval"],
+						label: mcpStateLabel(t, "pending-approval"),
 						tone: "warning",
 						reason: t("mcp.row.pendingApprovalReason"),
 						action: "review",
 					};
 		case "invalid-config":
 			return {
-				label: MCP_STATE_LABEL["invalid-config"],
+				label: mcpStateLabel(t, "invalid-config"),
 				tone: "error",
 				reason: firstLine(summary.configError ?? row.detail) ?? t("mcp.row.invalidConfigReason"),
 				...(summary.scope === "project" ? { action: "edit" as const } : {}),
 			};
 		case "pending-reload":
 			return {
-				label: MCP_STATE_LABEL["pending-reload"],
+				label: mcpStateLabel(t, "pending-reload"),
 				tone: "info",
 				reason: t("mcp.row.pendingReloadReason"),
 				action: "reload",
 			};
 		case "not-running":
 			return {
-				label: MCP_STATE_LABEL["not-running"],
+				label: mcpStateLabel(t, "not-running"),
 				tone: "neutral",
 				reason: t("mcp.row.notRunningReason"),
 				action: "open-chat",
@@ -224,7 +224,7 @@ function baseView(row: McpServerRow, now: number): McpRowView {
 			};
 		case "unknown":
 			return {
-				label: MCP_STATE_LABEL.unknown,
+				label: mcpStateLabel(t, "unknown"),
 				tone: "neutral",
 				reason: row.startingStalled ? t("mcp.row.stalledReason") : t("mcp.row.unknownReason"),
 			};
@@ -287,10 +287,10 @@ const EXPOSURE_LABEL = {
 	hidden: "mcp.exposure.hidden",
 } as const satisfies Record<McpEditableExposure, MessageKey>;
 
-export function mcpExposureLabel(exposure: McpEditableExposure): string {
+export function mcpExposureLabel(t: Translator, exposure: McpEditableExposure): string {
 	return t(EXPOSURE_LABEL[exposure]);
 }
 
-export function mcpConfiguredExposureText(summary: McpServerSummary): string {
+export function mcpConfiguredExposureText(t: Translator, summary: McpServerSummary): string {
 	return summary.exposure === "codemode" ? t("mcp.exposure.codemodeConfigured") : summary.exposure;
 }

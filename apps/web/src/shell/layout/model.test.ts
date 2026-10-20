@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { currentTranslator } from "@thinkrail/locales/react";
 import type { LayoutAttention } from "../../lib";
 import {
 	adoptToolSelections,
@@ -116,10 +117,18 @@ describe("workspace layout model", () => {
 			tabKey: `t${n}`,
 			name: `Terminal ${n}`,
 		});
-		expect(describeLayoutGroup([])).toBe("(empty)");
-		expect(describeLayoutGroup([toolTab("changes"), toolTab("review")])).toBe("(Changes, Review)");
+		expect(describeLayoutGroup(currentTranslator(), [])).toBe("(empty)");
+		expect(describeLayoutGroup(currentTranslator(), [toolTab("changes"), toolTab("review")])).toBe(
+			"(Changes, Review)",
+		);
 		expect(
-			describeLayoutGroup([terminal(1), terminal(2), terminal(3), terminal(4), terminal(5)]),
+			describeLayoutGroup(currentTranslator(), [
+				terminal(1),
+				terminal(2),
+				terminal(3),
+				terminal(4),
+				terminal(5),
+			]),
 		).toBe("(Terminal 1, Terminal 2, Terminal 3, +2)");
 	});
 
@@ -145,8 +154,8 @@ describe("workspace layout model", () => {
 	test("canonical tool labels override stale persisted display copy", () => {
 		const legacyFiles = { ...toolTab("files"), name: "All files" };
 		expect(toolTab("files").name).toBe("Files");
-		expect(layoutTabName(legacyFiles)).toBe("Files");
-		expect(layoutTabName(file("one"))).toBe("one.ts");
+		expect(layoutTabName(currentTranslator(), legacyFiles)).toBe("Files");
+		expect(layoutTabName(currentTranslator(), file("one"))).toBe("one.ts");
 	});
 
 	test("opens one canonical tab and keeps preview promotion one-way", () => {
@@ -236,7 +245,7 @@ describe("workspace layout model", () => {
 		for (const tab of [...source.tabs]) document = closeLayoutTab(document, tab.id).document;
 		expect(collectCenterGroups(document.center)).toHaveLength(4);
 		document = mutation(
-			removeLayoutGroup(document, { area: "center", groupId: source.id }),
+			removeLayoutGroup(currentTranslator(), document, { area: "center", groupId: source.id }),
 		).document;
 		expect(collectCenterGroups(document.center)).toHaveLength(3);
 
@@ -263,7 +272,7 @@ describe("workspace layout model", () => {
 		};
 		let document = baseDocument([file("one"), terminal]);
 		const intoToolPane = moveTabToGroup(document, terminal, { area: "right", groupId: "right-a" });
-		expect(intoToolPane).toEqual({ reason: separatePanesReason() });
+		expect(intoToolPane).toEqual({ reason: separatePanesReason(currentTranslator()) });
 		document = mutation(createAuxiliaryGroup(document, "right", terminal, 1, 6)).document;
 		const terminalPane = document.right.groups[1];
 		if (!terminalPane) throw new Error("Missing terminal pane fixture");
@@ -273,7 +282,7 @@ describe("workspace layout model", () => {
 		});
 		expect(
 			moveTabToGroup(document, toolTab("files"), { area: "right", groupId: terminalPane.id }),
-		).toEqual({ reason: separatePanesReason() });
+		).toEqual({ reason: separatePanesReason(currentTranslator()) });
 		const renamedTerminal = { ...terminal, name: "Build shell" };
 		document = mutation(openCenterTab(document, renamedTerminal, "center-a", "preview")).document;
 		expect(

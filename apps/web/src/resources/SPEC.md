@@ -49,9 +49,13 @@ control rather than emulate one.
   (both including an optional actual-placement callback), `HunkActions`, `ResourceRenderer` and its support
   types, plus `registerResourceRenderer`,
   `resolveRenderers`, `describeResource`, `anchorLabel`, and `isPlaceable`.
-- **Allowed deps:** `@thinkrail/contracts` types, the `lib` barrel, and React types.
+- **Allowed deps:** `@thinkrail/contracts` types, the `@thinkrail/locales` `MessageKey` type, the `lib`
+  barrel, and React types.
 - **Forbidden:** store, transport, shell, panels, and renderer implementations. Bundled implementations
   live under `panels/resources` and register metadata plus lazy loaders from the workbench composition edge.
+
+A renderer's `labelKey` is a catalog key, never translated text: registration happens once at module load,
+so the view-toggle, candidate pickers, and unplaced strip translate it at render with their own translator.
 
 Registration owns no content or tab state. Panes own transport URLs, review integration, selected renderer,
 and opaque per-tab view state. `anchorLabel` prefers a structural locator over its mandatory text fallback:

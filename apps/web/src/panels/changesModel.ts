@@ -5,7 +5,7 @@ import type {
 	GitFileStatus,
 	TurnChangeSet,
 } from "@thinkrail/contracts";
-import { currentLocale, t } from "@thinkrail/locales/react";
+import { currentTranslator, localeOf, type Translator, t } from "@thinkrail/locales/react";
 import { tupleKey } from "../lib";
 import { extendFolderChain, startFolderChain } from "./folderChains";
 import { VIRTUALIZED_DIFF_LINES } from "./largeDiff";
@@ -42,7 +42,9 @@ function scopeSuffix(scope: GitDiffScope): string {
 		case "commit":
 			return scope.sha.slice(0, 7);
 		case "turn":
-			return t("changes.scope.turnSuffix", { time: turnTimeLabel(scope.startedAt) });
+			return t("changes.scope.turnSuffix", {
+				time: turnTimeLabel(currentTranslator(), scope.startedAt),
+			});
 	}
 }
 
@@ -56,8 +58,8 @@ export function turnScope(turn: TurnChangeSet): Extract<GitDiffScope, { kind: "t
 	};
 }
 
-export function turnTimeLabel(startedAt: number): string {
-	return new Date(startedAt).toLocaleTimeString(currentLocale(), {
+export function turnTimeLabel(t: Translator, startedAt: number): string {
+	return new Date(startedAt).toLocaleTimeString(localeOf(t), {
 		hour: "2-digit",
 		minute: "2-digit",
 	});
@@ -113,6 +115,7 @@ export function estimatedSectionHeight(change: GitFileChange): number {
 }
 
 export function scopeLabel(
+	t: Translator,
 	scope: GitDiffScope,
 	commits: readonly GitCommit[] = [],
 	turns: readonly TurnChangeSet[] = [],
@@ -124,27 +127,28 @@ export function scopeLabel(
 		const latest = turns.at(-1);
 		return latest && latest.id === scope.id
 			? t("changes.scope.lastTurn")
-			: t("changes.scope.turn", { time: turnTimeLabel(scope.startedAt) });
+			: t("changes.scope.turn", { time: turnTimeLabel(t, scope.startedAt) });
 	}
 	const known = commits.find((c) => c.sha === scope.sha);
 	return known?.shortSha ?? scope.sha.slice(0, 7);
 }
 
 export function scopeTitle(
+	t: Translator,
 	scope: GitDiffScope,
 	commits: readonly GitCommit[] = [],
 	turns: readonly TurnChangeSet[] = [],
 ): string {
 	if (scope.kind === "turn") {
 		const files = turns.find((turn) => turn.id === scope.id)?.changes.length;
-		const time = turnTimeLabel(scope.startedAt);
+		const time = turnTimeLabel(t, scope.startedAt);
 		return files === undefined
 			? t("changes.scope.turnTitle", { time })
 			: t("changes.scope.turnTitleFiles", { time, count: files });
 	}
-	if (scope.kind !== "commit") return t("changes.scope.title", { label: scopeLabel(scope) });
+	if (scope.kind !== "commit") return t("changes.scope.title", { label: scopeLabel(t, scope) });
 	const known = commits.find((c) => c.sha === scope.sha);
-	return known?.subject ? `${known.shortSha} · ${known.subject}` : scopeLabel(scope, commits);
+	return known?.subject ? `${known.shortSha} · ${known.subject}` : scopeLabel(t, scope, commits);
 }
 
 export function splitPath(path: string): { dir: string; base: string } {

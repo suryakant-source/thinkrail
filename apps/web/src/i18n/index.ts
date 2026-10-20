@@ -1,4 +1,3 @@
-export { LocaleBoundary } from "./LocaleBoundary";
 export {
 	availableLocales,
 	effectiveLocale,
@@ -7,4 +6,4 @@ export {
 	languageOptions,
 	localOverlays,
 } from "./languages";
-export { localeSignature, useSystemLanguages } from "./useLocaleSync";
+export { localeSignature, useLocaleSync, useSystemLanguages } from "./useLocaleSync";

@@ -56,7 +56,7 @@ export function ProjectTrustNotice({ projectId }: { projectId: string }) {
 				open={confirmingRevoke}
 				onOpenChange={setConfirmingRevoke}
 				title={t("panels.projectTrust.stopTrustingTitle")}
-				description={stopTrustingText(project, supportsProjectTrust)}
+				description={stopTrustingText(t, project, supportsProjectTrust)}
 				confirmLabel={t("panels.projectTrust.stopTrusting")}
 				destructive
 				confirmTestId="project-untrust-confirm"
@@ -79,7 +79,7 @@ export function ProjectTrustNotice({ projectId }: { projectId: string }) {
 			>
 				<ShieldCheck className="-mt-2 size-14 shrink-0 text-feedback-success" aria-hidden />
 				<span className="min-w-0 flex-1 tr-text-ui text-text-default">
-					{trustedNoticeText(notice)}
+					{trustedNoticeText(t, notice)}
 				</span>
 				{stopTrusting}
 			</div>
@@ -87,7 +87,7 @@ export function ProjectTrustNotice({ projectId }: { projectId: string }) {
 	}
 
 	const pending = notice.kind === "unacknowledged";
-	const enables = notice.kind === "untrusted" ? trustEnablesText(notice) : null;
+	const enables = notice.kind === "untrusted" ? trustEnablesText(t, notice) : null;
 	return (
 		<div
 			data-testid="project-trust-notice"
@@ -100,7 +100,7 @@ export function ProjectTrustNotice({ projectId }: { projectId: string }) {
 					<span className="tr-text-ui text-text-default">
 						{pending
 							? t("panels.projectTrust.newSkills", { count: notice.names.length })
-							: untrustedNoticeText(notice)}
+							: untrustedNoticeText(t, notice)}
 					</span>
 					{enables ? (
 						<span data-testid="project-trust-enables" className="text-text-muted tr-text-metadata">

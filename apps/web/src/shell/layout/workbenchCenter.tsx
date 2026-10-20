@@ -54,7 +54,7 @@ export const CenterGroupView = memo(function CenterGroupView({
 		vertical: size.height >= LAYOUT_LIMITS.minCenterHeight * 2,
 	};
 	const selected = group.tabs.find((tab) => tab.id === selectedId) ?? group.tabs[0];
-	const groupRemoval = removeLayoutGroup(shared.document, location);
+	const groupRemoval = removeLayoutGroup(t, shared.document, location);
 	const applySelect = (tabId: string, keep?: boolean) => {
 		shared.onSelectTab(location, tabId, { center: true, ...(keep !== undefined ? { keep } : {}) });
 	};

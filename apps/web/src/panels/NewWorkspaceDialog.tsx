@@ -452,7 +452,7 @@ export function NewWorkspaceDialog({
 
 	const selectedProject = projects.find((p) => p.id === selectedProjectId);
 	const trustNotice = deriveProjectTrustNotice(selectedProject, trustSummary);
-	const trustEnables = trustNotice.kind === "untrusted" ? trustEnablesText(trustNotice) : null;
+	const trustEnables = trustNotice.kind === "untrusted" ? trustEnablesText(t, trustNotice) : null;
 	const isolated = target === "worktree";
 
 	return (
@@ -549,7 +549,7 @@ export function NewWorkspaceDialog({
 							<TriangleAlert className="mt-2 size-14 shrink-0 text-feedback-warning" aria-hidden />
 							<span className="flex min-w-0 flex-1 flex-col gap-2">
 								<span className="tr-text-ui text-text-default">
-									{untrustedNoticeText(trustNotice)} {t("panels.newWorkspace.trustUnaffected")}
+									{untrustedNoticeText(t, trustNotice)} {t("panels.newWorkspace.trustUnaffected")}
 								</span>
 								{trustEnables ? (
 									<span className="text-text-muted tr-text-metadata">{trustEnables}</span>

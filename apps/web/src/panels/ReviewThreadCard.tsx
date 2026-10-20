@@ -87,16 +87,20 @@ export function ReviewThreadCard({
 						data-testid="review-thread-anchor"
 						className={`review-thread-label rounded-sm tr-text-eyebrow outline-none focus-visible:ring-2 focus-visible:ring-primary${thread.stale ? " text-feedback-warning" : ""}`}
 						onClick={onActivate}
-						{...(thread.anchorState === "outdated" ? { title: outdatedReason(thread.anchor) } : {})}
+						{...(thread.anchorState === "outdated"
+							? { title: outdatedReason(t, thread.anchor) }
+							: {})}
 					>
-						{threadLabel(thread)}
+						{threadLabel(t, thread)}
 					</button>
 				) : (
 					<span
 						className={`review-thread-label tr-text-eyebrow${thread.stale ? " text-feedback-warning" : ""}`}
-						{...(thread.anchorState === "outdated" ? { title: outdatedReason(thread.anchor) } : {})}
+						{...(thread.anchorState === "outdated"
+							? { title: outdatedReason(t, thread.anchor) }
+							: {})}
 					>
-						{threadLabel(thread)}
+						{threadLabel(t, thread)}
 					</span>
 				)}
 				{thread.status === "draft" && (
