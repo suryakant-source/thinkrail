@@ -16,7 +16,7 @@ instance ([[module-locales]] `./react`). Components never do this themselves: th
 
 ## Boundary
 
-- **Hydration:** `transport` reads `locales.list` after each welcome from a v86+ host and again on every
+- **Hydration:** `transport` reads `locales.list` after each welcome from a v87+ host and again on every
   `locales.changed` nudge, installing the snapshot with `installLocalLocales` (an older host installs
   `null`, so only bundled languages exist). This module only derives from the store.
 - **Owns:** the `languageOptions` derivation (System + every available tag with its own-language name via

@@ -23,7 +23,7 @@ import {
 	WORKSPACE_SETTLE_PROTOCOL_VERSION,
 	type Workspace,
 } from "@thinkrail/contracts";
-import { type Translator, t } from "@thinkrail/locales/react";
+import type { Translator } from "@thinkrail/locales/react";
 import type { LoginState } from "../auth";
 import {
 	compactAge,

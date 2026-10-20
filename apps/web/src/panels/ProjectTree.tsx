@@ -971,12 +971,12 @@ function WorkspaceRow({
 							{readAction === "markRead" ? (
 								<DropdownMenuItem data-testid="workspace-mark-read" onSelect={onMarkRead}>
 									<MailOpen />
-									Mark as read
+									{t("panels.projectTree.markRead")}
 								</DropdownMenuItem>
 							) : readAction === "markUnread" ? (
 								<DropdownMenuItem data-testid="workspace-mark-unread" onSelect={onMarkUnread}>
 									<MailUnread />
-									Mark as unread
+									{t("panels.projectTree.markUnread")}
 								</DropdownMenuItem>
 							) : null}
 							{canSettle ? (

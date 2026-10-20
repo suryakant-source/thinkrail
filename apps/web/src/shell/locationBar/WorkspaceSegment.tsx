@@ -247,7 +247,7 @@ export function WorkspaceSegment({
 										onSelect={() => markWorkspaceRead(workspace.id)}
 									>
 										<MailOpen />
-										Mark as read
+										{t("shell.location.workspace.markRead")}
 									</DropdownMenuItem>
 								) : readAction === "markUnread" ? (
 									<DropdownMenuItem
@@ -255,7 +255,7 @@ export function WorkspaceSegment({
 										onSelect={() => markWorkspaceUnread(workspace.id)}
 									>
 										<MailUnread />
-										Mark as unread
+										{t("shell.location.workspace.markUnread")}
 									</DropdownMenuItem>
 								) : null}
 								{canSettle ? (

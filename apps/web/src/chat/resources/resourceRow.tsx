@@ -15,7 +15,7 @@ import type {
 	DelegationRunStatus,
 	SubagentResourceSummary,
 } from "@thinkrail/contracts";
-import { t as translate, type Translator, useT } from "@thinkrail/locales/react";
+import { type Translator, useT } from "@thinkrail/locales/react";
 import { cn } from "@thinkrail/ui/utils";
 import type { KeyboardEvent, ReactNode } from "react";
 

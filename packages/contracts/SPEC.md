@@ -47,7 +47,7 @@ default, narrow cross-ring guards, and the quit-confirmation rule both clients d
   re-exports
   `DEFAULT_CONFIG`, `SYSTEM_LOCALE_PREFERENCE` + **`isLocalePreference(value)`** (`"system"` or a canonical
   BCP-47 tag — the `AppConfig.locale` contract; local language file shapes are `LocalLocalesSnapshot` /
-  `LocalLocaleFile` with closed error codes, served by `locales.list` from `LOCALES_PROTOCOL_VERSION`, v86),
+  `LocalLocaleFile` with closed error codes, served by `locales.list` from `LOCALES_PROTOCOL_VERSION`, v87),
   `THEME_MODES`, `isThemeMode`, `isSystemThemePair`, `normalizeThemePreference`,
   `JBCENTRAL_QUOTA_REFRESH_SECONDS`, `isJbcentralQuotaRefreshSeconds`, `isJbcentralConnected`,
   `SESSION_RENAME_PROTOCOL_VERSION`, `SESSION_TITLE_MAX_LENGTH`, `normalizeSessionTitle`,

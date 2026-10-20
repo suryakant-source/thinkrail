@@ -64,7 +64,7 @@ export function markWorkspaceUnread(workspaceId: string): void {
 		.then(({ record }) => useAppStore.getState().finishMarkWorkspaceUnread(workspaceId, record))
 		.catch((err) => {
 			useAppStore.getState().finishMarkWorkspaceUnread(workspaceId, null);
-			toast.error(errorText(err, "Couldn't mark the workspace unread"));
+			toast.error(errorText(err, t("panels.workspaceActions.markUnreadFailed")));
 		});
 }
 
@@ -75,7 +75,7 @@ export function markWorkspaceRead(workspaceId: string): void {
 			const store = useAppStore.getState();
 			for (const record of records) store.applySessionState(record);
 		})
-		.catch((err) => toast.error(errorText(err, "Couldn't mark the workspace read")));
+		.catch((err) => toast.error(errorText(err, t("panels.workspaceActions.markReadFailed"))));
 }
 
 export function workspaceRenameValue(currentName: string, input: string): string | null {
