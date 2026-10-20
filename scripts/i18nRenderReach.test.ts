@@ -99,3 +99,26 @@ test("catches the reviewed bypasses: currentTranslator, defaults, classes, rende
 		"14:t",
 	]);
 });
+
+test("normalizes namespace callables and named summaries", () => {
+	const helpers = [
+		'import { t } from "../../packages/locales/src/react";',
+		"export function label(kind?: unknown) { return t(String(kind)); }",
+	].join("\n");
+	const app = [
+		'import * as helpers from "./helpers";',
+		"import { label } from './helpers';",
+		"export const TITLE = helpers.label();",
+		"export const named = { summary: label };",
+		"export const inline = { summary: helpers.label };",
+		"export function View() {",
+		"  return [0].map(helpers.label);",
+		"}",
+	].join("\n");
+	expect(texts(app, { "helpers.ts": helpers })).toEqual([
+		"3:label",
+		"4:summary reads the global translator",
+		"5:summary reads the global translator",
+		"7:label",
+	]);
+});

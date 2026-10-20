@@ -164,20 +164,25 @@ export function renderReachViolations(
 		const translatingFunctions = new Set<ts.Symbol>();
 		const translatingValues = new Set<ts.Symbol>();
 		const symbolOf = (node: ts.Node) => resolve(checker.getSymbolAtLocation(node));
+		const callable = (node: ts.Identifier): ts.Expression =>
+			ts.isPropertyAccessExpression(node.parent) && node.parent.name === node ? node.parent : node;
 		const isLocaleRead = (node: ts.Identifier): boolean => {
 			const symbol = symbolOf(node);
 			if (!symbol) return false;
 			if (readers.has(symbol) || translatingValues.has(symbol)) return true;
 			if (!translatingFunctions.has(symbol)) return false;
-			const callee =
-				ts.isPropertyAccessExpression(node.parent) && node.parent.name === node
-					? node.parent
-					: node;
-			if (!ts.isCallExpression(callee.parent)) return false;
-			const call = callee.parent;
-			if (call.expression === callee) return true;
+			const expression = callable(node);
+			if (!ts.isCallExpression(expression.parent)) return false;
+			const call = expression.parent;
+			if (call.expression === expression) return true;
 			const name = calleeName(call);
-			return !!name && SYNCHRONOUS_CALLBACKS.has(name) && call.arguments.includes(node);
+			return !!name && SYNCHRONOUS_CALLBACKS.has(name) && call.arguments.includes(expression);
+		};
+		const isTranslatingReference = (node: ts.Expression): boolean => {
+			const target = ts.isPropertyAccessExpression(node) ? node.name : node;
+			if (!ts.isIdentifier(target)) return false;
+			const symbol = symbolOf(target);
+			return !!symbol && translatingFunctions.has(symbol);
 		};
 		const readsLocaleWhenCalled = (fn: FunctionNode): boolean => {
 			let found = false;
@@ -238,6 +243,19 @@ export function renderReachViolations(
 
 		for (const file of sources) {
 			const visit = (node: ts.Node): void => {
+				if (
+					ts.isPropertyAssignment(node) &&
+					ts.isIdentifier(node.name) &&
+					node.name.text === "summary" &&
+					isTranslatingReference(node.initializer)
+				) {
+					const { line } = file.getLineAndCharacterOfPosition(node.getStart(file));
+					violations.push({
+						file: relative(repoRoot, file.fileName).split(sep).join("/"),
+						line: line + 1,
+						text: "summary reads the global translator",
+					});
+				}
 				if ((isGetterLike(node) || isRenderSeam(node)) && readsLocaleWhenCalled(node)) {
 					const { line } = file.getLineAndCharacterOfPosition(node.getStart(file));
 					violations.push({
@@ -248,11 +266,12 @@ export function renderReachViolations(
 				}
 				if (ts.isIdentifier(node) && !ts.isImportSpecifier(node.parent)) {
 					const owner = ownerWhenEvaluated(node);
+					const expression = callable(node);
 					const atModuleLoad =
 						!owner &&
 						!ts.isExportSpecifier(node.parent) &&
-						ts.isCallExpression(node.parent) &&
-						node.parent.expression === node;
+						ts.isCallExpression(expression.parent) &&
+						expression.parent.expression === expression;
 					if (((owner && isComponentOrHook(owner)) || atModuleLoad) && isLocaleRead(node)) {
 						const { line } = file.getLineAndCharacterOfPosition(node.getStart(file));
 						const key = `${file.fileName}:${line}:${node.text}`;

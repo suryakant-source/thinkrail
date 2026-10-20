@@ -120,17 +120,17 @@ test("interpolation can never complete a tag: a value-built attributed tag is re
 	const { T } = await import("./react");
 	const { validateCatalog } = await import("./index");
 	const local = validateCatalog({
-		"settings.language.add.steps": '<0>en.json</0><{{base}} title="injected"/>',
+		"shell.location.branch.fromBase": '· von <0>{{base}}</0><{{base}} title="injected"/>',
 		"lib.compactAge.underHour": "<1 год",
 	});
 	expect(local.ok && Object.keys(local.strings)).toEqual(["lib.compactAge.underHour"]);
 	applyLocale("de", { de: local.ok ? local.strings : {} });
 	const markup = renderToStaticMarkup(
 		createElement(T, {
-			i18nKey: "settings.language.add.steps",
+			i18nKey: "shell.location.branch.fromBase",
 			values: { base: "0" },
-			components: [createElement("a", { key: "a", href: "https://github.com/" })],
+			components: [createElement("code", { key: "c" })],
 		}),
 	);
-	expect(markup).not.toContain("injected");
+	expect(markup).toBe("· from <code>0</code>");
 });
